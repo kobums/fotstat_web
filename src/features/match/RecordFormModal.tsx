@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import Button from "../../components/Button/Button";
 import Modal from "../../components/Modal/Modal";
 import Stepper from "../../components/Stepper/Stepper";
+import Select from "../../components/Select/Select";
 import { ApiError } from "../../core/api/client";
 import type { MatchRecord, Player } from "../../core/api/types";
 import { useCreateRecord, useUpdateRecord } from "./useRecords";
@@ -69,23 +70,16 @@ export default function RecordFormModal({
             이 쿼터에 기록할 수 있는 선수가 없습니다. 먼저 스쿼드에 선수를 추가하세요.
           </div>
         ) : (
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="player">
-              선수
-            </label>
-            <select
-              id="player"
-              className={styles.select}
-              value={playerId}
-              onChange={(e) => setPlayerId(Number(e.target.value))}
-            >
-              {selectable.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.number}. {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="선수"
+            id="player"
+            value={playerId}
+            onChange={(v) => setPlayerId(Number(v))}
+            options={selectable.map((p) => ({
+              value: p.id,
+              label: `${p.number}. ${p.name}`,
+            }))}
+          />
         )}
 
         <div className={styles.steppers}>

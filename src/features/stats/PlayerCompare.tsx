@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
+import Select from "../../components/Select/Select";
 import type { PlayerStat } from "./useTeamStats";
 import styles from "./PlayerCompare.module.css";
 
@@ -29,17 +30,17 @@ export default function PlayerCompare({ players }: { players: PlayerStat[] }) {
     ];
 
   const renderSelect = (value: number, onChange: (v: number) => void) => (
-    <select
-      className={styles.select}
+    <Select
+      compact
+      wrapClassName={styles.cmpField}
+      aria-label="비교할 선수"
       value={value}
-      onChange={(e) => onChange(Number(e.target.value))}
-    >
-      {players.map((p) => (
-        <option key={p.id} value={p.id}>
-          {p.number}. {p.name}
-        </option>
-      ))}
-    </select>
+      onChange={(v) => onChange(Number(v))}
+      options={players.map((p) => ({
+        value: p.id,
+        label: `${p.number}. ${p.name}`,
+      }))}
+    />
   );
 
   return (

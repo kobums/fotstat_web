@@ -4,34 +4,6 @@
   gap: var(--sp-4);
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.label {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  color: var(--text-sec);
-}
-
-.select {
-  height: 52px;
-  padding: 0 12px;
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line-strong);
-  background: var(--bg-elev2);
-  color: var(--text);
-  font-size: 16px;
-  cursor: pointer;
-}
-.select:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
 .playerName {
   font-size: 18px;
   font-weight: 700;

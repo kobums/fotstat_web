@@ -38,21 +38,8 @@
   color: var(--text-ter);
 }
 
-.select {
+.cmpField {
   flex: 1;
-  min-width: 0;
-  height: 40px;
-  padding: 0 8px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--line-strong);
-  background: var(--bg-elev2);
-  color: var(--text);
-  font-size: 14px;
-  cursor: pointer;
-}
-.select:focus {
-  outline: none;
-  border-color: var(--accent);
 }
 
 .rows {

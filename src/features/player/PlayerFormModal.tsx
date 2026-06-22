@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import Button from "../../components/Button/Button";
 import Modal from "../../components/Modal/Modal";
 import TextField from "../../components/TextField/TextField";
+import Select from "../../components/Select/Select";
 import { ApiError } from "../../core/api/client";
 import type { Player } from "../../core/api/types";
 import { POSITION_OPTIONS } from "../../lib/position";
@@ -63,27 +64,16 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
             value={number}
             onChange={(e) => setNumber(e.target.value)}
           />
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="pos">
-              포지션
-            </label>
-            <select
-              id="pos"
-              className={styles.select}
-              value={position}
-              onChange={(e) => setPosition(e.target.value)}
-            >
-              {POSITION_OPTIONS.map((g) => (
-                <optgroup key={g.group} label={g.group}>
-                  {g.values.map((v) => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="포지션"
+            id="pos"
+            value={position}
+            onChange={setPosition}
+            options={POSITION_OPTIONS.map((g) => ({
+              label: g.group,
+              options: g.values.map((v) => ({ value: v, label: v })),
+            }))}
+          />
         </div>
         {error && <div className={styles.error}>{error}</div>}
         <Button type="submit" loading={create.isPending || update.isPending}>
