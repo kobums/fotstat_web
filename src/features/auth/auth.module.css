@@ -1,0 +1,75 @@
+.screen {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-5);
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: var(--sp-2);
+}
+
+.brandMark {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.brandSub {
+  color: var(--text-sec);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.formError {
+  color: var(--neg);
+  font-size: 13px;
+  text-align: center;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-ter);
+  font-size: 12px;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.footer {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-sec);
+}
+
+.footer a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.appleNote {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-ter);
+}
