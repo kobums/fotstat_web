@@ -3,6 +3,7 @@ import { useQueries } from "@tanstack/react-query";
 import { quarterApi, recordApi } from "../../core/api/endpoints";
 import type { Player, Quarter } from "../../core/api/types";
 import { qk } from "../../lib/queryKeys";
+import { combineLists } from "../../lib/combineQueries";
 import { parseMatchDate } from "../../lib/date";
 import { usePlayers } from "../player/usePlayers";
 import { useMatches } from "../match/useMatches";
@@ -69,38 +70,35 @@ export function useTeamStats(
     return list;
   }, [matches.data, start, end]);
 
-  const quarterQueries = useQueries({
+  // `combine` flattens the per-query results and applies react-query's
+  // structural sharing, so `.data` stays referentially stable across renders
+  // when the underlying data is unchanged — letting the aggregate useMemo below
+  // actually memoize (a raw useQueries array is a new reference every render).
+  const quarters = useQueries({
     queries: matchList.map((m) => ({
       queryKey: qk.quarters(m.id),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         quarterApi.list(m.id, signal),
       enabled: m.id > 0,
     })),
+    combine: combineLists,
   });
+  const allQuarters: Quarter[] = quarters.data;
 
-  const allQuarters: Quarter[] = useMemo(
-    () => quarterQueries.flatMap((q) => q.data ?? []),
-    [quarterQueries],
-  );
-
-  const recordQueries = useQueries({
+  const records = useQueries({
     queries: allQuarters.map((q) => ({
       queryKey: qk.records(q.id),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         recordApi.list(q.id, signal),
       enabled: q.id > 0,
     })),
+    combine: combineLists,
   });
 
-  const quartersLoading = quarterQueries.some((q) => q.isLoading);
-  const recordsLoading = recordQueries.some((q) => q.isLoading);
   const isLoading =
-    players.isLoading || matches.isLoading || quartersLoading || recordsLoading;
+    players.isLoading || matches.isLoading || quarters.isLoading || records.isLoading;
   const isError =
-    players.isError ||
-    matches.isError ||
-    quarterQueries.some((q) => q.isError) ||
-    recordQueries.some((q) => q.isError);
+    players.isError || matches.isError || quarters.isError || records.isError;
 
   const aggregate = useMemo(() => {
     const quarterToMatch = new Map<number, number>();
@@ -120,26 +118,24 @@ export function useTeamStats(
     let totalGoal = 0;
     let totalAssist = 0;
 
-    recordQueries.forEach((rq) => {
-      (rq.data ?? []).forEach((r) => {
-        const matchId = quarterToMatch.get(r.quarter);
-        totalGoal += r.goal;
-        totalAssist += r.assist;
-        if (matchId !== undefined) {
-          homeByMatch.set(matchId, (homeByMatch.get(matchId) ?? 0) + r.goal);
-        }
-        const acc = perPlayer.get(r.player) ?? {
-          min: 0,
-          goal: 0,
-          assist: 0,
-          matches: new Set<number>(),
-        };
-        acc.min += r.min;
-        acc.goal += r.goal;
-        acc.assist += r.assist;
-        if (matchId !== undefined) acc.matches.add(matchId);
-        perPlayer.set(r.player, acc);
-      });
+    records.data.forEach((r) => {
+      const matchId = quarterToMatch.get(r.quarter);
+      totalGoal += r.goal;
+      totalAssist += r.assist;
+      if (matchId !== undefined) {
+        homeByMatch.set(matchId, (homeByMatch.get(matchId) ?? 0) + r.goal);
+      }
+      const acc = perPlayer.get(r.player) ?? {
+        min: 0,
+        goal: 0,
+        assist: 0,
+        matches: new Set<number>(),
+      };
+      acc.min += r.min;
+      acc.goal += r.goal;
+      acc.assist += r.assist;
+      if (matchId !== undefined) acc.matches.add(matchId);
+      perPlayer.set(r.player, acc);
     });
 
     // A match counts as played once it has at least one quarter.
@@ -184,7 +180,7 @@ export function useTeamStats(
       losses,
       players: playerStats,
     };
-  }, [allQuarters, recordQueries, players.data]);
+  }, [allQuarters, records.data, players.data]);
 
   return { isLoading, isError, ...aggregate };
 }

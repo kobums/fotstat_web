@@ -4,6 +4,7 @@ import { quarterApi, recordApi } from "../../core/api/endpoints";
 import type { Quarter } from "../../core/api/types";
 import { resultOf, type Result } from "../../components/ResultPill/ResultPill";
 import { qk } from "../../lib/queryKeys";
+import { combineLists } from "../../lib/combineQueries";
 import { useMatches } from "./useMatches";
 
 export interface MatchResult {
@@ -19,33 +20,30 @@ export function useMatchResults(teamId: number) {
   const matches = useMatches(teamId);
   const matchList = matches.data ?? [];
 
-  const quarterQueries = useQueries({
+  // `combine` keeps `.data` referentially stable across renders (see
+  // combineLists), so the results useMemo below memoizes correctly.
+  const quarters = useQueries({
     queries: matchList.map((m) => ({
       queryKey: qk.quarters(m.id),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         quarterApi.list(m.id, signal),
       enabled: m.id > 0,
     })),
+    combine: combineLists,
   });
+  const allQuarters: Quarter[] = quarters.data;
 
-  const allQuarters: Quarter[] = useMemo(
-    () => quarterQueries.flatMap((q) => q.data ?? []),
-    [quarterQueries],
-  );
-
-  const recordQueries = useQueries({
+  const records = useQueries({
     queries: allQuarters.map((q) => ({
       queryKey: qk.records(q.id),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         recordApi.list(q.id, signal),
       enabled: q.id > 0,
     })),
+    combine: combineLists,
   });
 
-  const isLoading =
-    matches.isLoading ||
-    quarterQueries.some((q) => q.isLoading) ||
-    recordQueries.some((q) => q.isLoading);
+  const isLoading = matches.isLoading || quarters.isLoading || records.isLoading;
 
   const results = useMemo(() => {
     const quarterToMatch = new Map<number, number>();
@@ -55,11 +53,9 @@ export function useMatchResults(teamId: number) {
       quarterToMatch.set(q.id, q.match);
       away.set(q.match, (away.get(q.match) ?? 0) + q.awaygoals);
     });
-    recordQueries.forEach((rq) => {
-      (rq.data ?? []).forEach((r) => {
-        const mId = quarterToMatch.get(r.quarter);
-        if (mId !== undefined) home.set(mId, (home.get(mId) ?? 0) + r.goal);
-      });
+    records.data.forEach((r) => {
+      const mId = quarterToMatch.get(r.quarter);
+      if (mId !== undefined) home.set(mId, (home.get(mId) ?? 0) + r.goal);
     });
     const playedIds = new Set(allQuarters.map((q) => q.match));
     const map = new Map<number, MatchResult>();
@@ -69,7 +65,7 @@ export function useMatchResults(teamId: number) {
       map.set(mId, { home: h, away: a, result: resultOf(h, a), played: true });
     });
     return map;
-  }, [allQuarters, recordQueries]);
+  }, [allQuarters, records.data]);
 
   return { isLoading, results };
 }

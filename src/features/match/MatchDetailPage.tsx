@@ -76,7 +76,10 @@ export default function MatchDetailPage() {
         .reduce((s, r) => s + r.goal, 0),
     [recordsByQuarter],
   );
-  const awayTotal = quarterList.reduce((s, q) => s + q.awaygoals, 0);
+  const awayTotal = useMemo(
+    () => quarterList.reduce((s, q) => s + q.awaygoals, 0),
+    [quarterList],
+  );
 
   const loading = match.isLoading || players.isLoading || quarters.isLoading;
   const error = match.isError || players.isError || quarters.isError;
