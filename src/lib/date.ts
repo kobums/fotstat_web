@@ -30,14 +30,26 @@ export function toApiDateSeconds(d: Date): string {
   );
 }
 
-/** "YYYY-MM-DD HH:mm:ss" -> "YYYY-MM-DDTHH:mm" for datetime-local inputs. */
-export function toInputValue(apiDate: string): string {
-  const d = parseMatchDate(apiDate);
-  if (!d) return "";
+/** Date -> "YYYY-MM-DDTHH:mm" for datetime-local inputs. */
+function dateToInputValue(d: Date): string {
   return (
     `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T` +
     `${pad(d.getHours())}:${pad(d.getMinutes())}`
   );
+}
+
+/** "YYYY-MM-DD HH:mm:ss" -> "YYYY-MM-DDTHH:mm" for datetime-local inputs. */
+export function toInputValue(apiDate: string): string {
+  const d = parseMatchDate(apiDate);
+  return d ? dateToInputValue(d) : "";
+}
+
+/** Current local date/time, rounded to the nearest 10 minutes, as
+ *  "YYYY-MM-DDTHH:mm" — aligns with the match form's 10-minute step. */
+export function nowInputValue(): string {
+  const d = new Date();
+  d.setMinutes(Math.round(d.getMinutes() / 10) * 10, 0, 0);
+  return dateToInputValue(d);
 }
 
 /** "YYYY-MM-DDTHH:mm" (input) -> "YYYY-MM-DD HH:mm:ss" (API). */
