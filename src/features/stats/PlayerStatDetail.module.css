@@ -1,0 +1,78 @@
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.name {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-2);
+}
+
+.cmpCard {
+  margin-top: var(--sp-4);
+  background: var(--bg-elev2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-3);
+}
+
+.cmpTitle {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-sec);
+  margin-bottom: var(--sp-2);
+}
+
+.cmpRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: baseline;
+  gap: var(--sp-2);
+  padding: 6px 0;
+}
+
+.cmpLabel {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cmpValue {
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.cmpAvg {
+  font-size: 12px;
+  color: var(--text-ter);
+  font-variant-numeric: tabular-nums;
+}
+
+.cmpDiff {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
