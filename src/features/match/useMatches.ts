@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { matchApi } from "../../core/api/endpoints";
 import { qk } from "../../lib/queryKeys";
+import { notifyError } from "../../lib/notifyError";
 
 const PAST_PAGE_SIZE = 20;
 
@@ -104,5 +105,6 @@ export function useDeleteMatch(teamId: number) {
       qc.removeQueries({ queryKey: qk.match(id) });
       qc.removeQueries({ queryKey: qk.quarters(id) });
     },
+    onError: notifyError("경기를 삭제하지 못했습니다."),
   });
 }

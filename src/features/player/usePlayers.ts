@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { playerApi, type PlayerInput } from "../../core/api/endpoints";
 import { qk } from "../../lib/queryKeys";
+import { notifyError } from "../../lib/notifyError";
 
 export function usePlayers(teamId: number) {
   return useQuery({
@@ -36,5 +37,6 @@ export function useDeletePlayer(teamId: number) {
   return useMutation({
     mutationFn: (id: number) => playerApi.remove(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.players(teamId) }),
+    onError: notifyError("선수를 삭제하지 못했습니다."),
   });
 }

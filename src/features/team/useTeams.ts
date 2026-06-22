@@ -6,6 +6,7 @@ import {
 import { teamApi } from "../../core/api/endpoints";
 import { useAuth } from "../../core/auth/AuthContext";
 import { qk } from "../../lib/queryKeys";
+import { notifyError } from "../../lib/notifyError";
 
 export function useTeams() {
   const { user } = useAuth();
@@ -56,5 +57,6 @@ export function useDeleteTeam() {
   return useMutation({
     mutationFn: (id: number) => teamApi.remove(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.teams(userId) }),
+    onError: notifyError("팀을 삭제하지 못했습니다."),
   });
 }

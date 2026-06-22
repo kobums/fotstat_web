@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { quarterApi } from "../../core/api/endpoints";
 import { qk } from "../../lib/queryKeys";
+import { notifyError } from "../../lib/notifyError";
 
 export function useQuarters(matchId: number) {
   return useQuery({
@@ -29,6 +30,7 @@ export function useUpdateAwaygoals(matchId: number) {
     mutationFn: (vars: { id: number; awaygoals: number }) =>
       quarterApi.updateAwaygoals(vars.id, vars.awaygoals),
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.quarters(matchId) }),
+    onError: notifyError("실점을 저장하지 못했습니다."),
   });
 }
 
@@ -42,5 +44,6 @@ export function useDeleteQuarter(matchId: number) {
       // into aggregation if the id is reused.
       qc.removeQueries({ queryKey: qk.records(quarterId) });
     },
+    onError: notifyError("쿼터를 삭제하지 못했습니다."),
   });
 }

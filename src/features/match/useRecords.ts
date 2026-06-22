@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { recordApi } from "../../core/api/endpoints";
 import { qk } from "../../lib/queryKeys";
+import { notifyError } from "../../lib/notifyError";
 
 export function useRecords(quarterId: number) {
   return useQuery({
@@ -45,5 +46,6 @@ export function useDeleteRecord(quarterId: number) {
   return useMutation({
     mutationFn: (id: number) => recordApi.remove(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.records(quarterId) }),
+    onError: notifyError("기록을 삭제하지 못했습니다."),
   });
 }
