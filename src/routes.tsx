@@ -1,5 +1,6 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import RequireAuth from "./core/auth/RequireAuth";
+import CatchAllRedirect from "./core/auth/CatchAllRedirect";
 import AppLayout from "./components/AppShell/AppLayout";
 import LandingPage from "./features/landing/LandingPage";
 import LoginPage from "./features/auth/LoginPage";
@@ -48,5 +49,5 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  { path: "*", element: <Navigate to="/myteam" replace /> },
+  { path: "*", element: <CatchAllRedirect /> },
 ]);
