@@ -28,11 +28,12 @@
   --field-grass: #e8f1e2;
   --field-line: rgba(0, 0, 0, 0.2);
 
-  /* Position colors (constant across themes) */
-  --pos-gk: #f5c518;
-  --pos-def: #3fa9f5;
-  --pos-mid: #a07bff;
-  --pos-att: #ff5c2b;
+  /* Position/role colors (constant across themes).
+     Named --role-* to avoid confusion with the semantic --pos (positive). */
+  --role-gk: #f5c518;
+  --role-def: #3fa9f5;
+  --role-mid: #a07bff;
+  --role-att: #ff5c2b;
 
   /* Radius */
   --r-sm: 4px;
@@ -48,7 +49,9 @@
   --sp-5: 20px;
 
   /* Layout */
-  --content-max: 960px;
+  --content-max: 1080px;
+  --sidebar-w: 264px;
+  --header-h: 56px;
   --tabbar-h: 64px;
 
   color-scheme: light;
