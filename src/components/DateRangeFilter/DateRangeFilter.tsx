@@ -1,3 +1,4 @@
+import DatePicker from "../DatePicker/DatePicker";
 import styles from "./DateRangeFilter.module.css";
 
 interface Props {
@@ -11,21 +12,19 @@ export default function DateRangeFilter({ start, end, onChange }: Props) {
   const active = !!start || !!end;
   return (
     <div className={styles.bar}>
-      <input
-        type="date"
-        className={styles.input}
+      <DatePicker
         value={start}
         max={end || undefined}
-        onChange={(e) => onChange({ start: e.target.value, end })}
+        onChange={(v) => onChange({ start: v, end })}
+        placeholder="시작일"
         aria-label="시작일"
       />
       <span className={styles.tilde}>~</span>
-      <input
-        type="date"
-        className={styles.input}
+      <DatePicker
         value={end}
         min={start || undefined}
-        onChange={(e) => onChange({ start, end: e.target.value })}
+        onChange={(v) => onChange({ start, end: v })}
+        placeholder="종료일"
         aria-label="종료일"
       />
       {active && (
