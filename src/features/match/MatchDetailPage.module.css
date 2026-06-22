@@ -1,0 +1,82 @@
+.page {
+  min-height: 100%;
+}
+
+.headerBtn,
+.headerBtnDanger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg-elev2);
+  color: var(--text);
+  cursor: pointer;
+}
+.headerBtn:hover {
+  background: var(--bg-elev3);
+}
+.headerBtnDanger {
+  color: var(--neg);
+}
+.headerBtnDanger:hover {
+  background: var(--bg-elev3);
+}
+.headerBtnDanger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.content {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: var(--sp-5) var(--sp-4);
+}
+
+.team {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.teamName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-sec);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.goals {
+  font-size: 40px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.quarters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}

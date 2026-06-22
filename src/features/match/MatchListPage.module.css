@@ -1,0 +1,138 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-3);
+}
+
+.count {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-sec);
+}
+
+.section {
+  margin-top: var(--sp-4);
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--text-sec);
+  margin-bottom: var(--sp-2);
+  text-transform: uppercase;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.more {
+  width: 100%;
+  margin-top: var(--sp-2);
+  padding: 12px;
+  background: var(--bg-elev2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  color: var(--text-sec);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.more:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--bg-elev3);
+}
+.more:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.rowMain {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  min-width: 0;
+}
+.rowMain:hover {
+  background: var(--bg-elev2);
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+
+.away {
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date {
+  font-size: 13px;
+  color: var(--text-sec);
+}
+
+.chevron {
+  color: var(--text-ter);
+  font-size: 20px;
+}
+
+.rowActions {
+  display: flex;
+  gap: 4px;
+  padding-right: var(--sp-2);
+}
+
+.edit,
+.delete {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+}
+.edit {
+  color: var(--text-sec);
+}
+.edit:hover {
+  color: var(--text);
+  background: var(--bg-elev3);
+}
+.delete {
+  color: var(--neg);
+}
+.delete:hover {
+  background: var(--bg-elev3);
+}

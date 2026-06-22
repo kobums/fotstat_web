@@ -1,0 +1,165 @@
+.section {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.qLabel {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 800;
+  flex: 1;
+}
+
+.dur {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-ter);
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.home {
+  font-size: 28px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  min-width: 30px;
+  text-align: center;
+}
+
+.colon {
+  font-size: 22px;
+  color: var(--text-ter);
+}
+
+.delQuarter {
+  background: none;
+  border: none;
+  color: var(--text-ter);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: var(--r-sm);
+}
+.delQuarter:hover {
+  color: var(--neg);
+  background: var(--bg-elev3);
+}
+
+.summary {
+  display: flex;
+  gap: var(--sp-3);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sec);
+  font-variant-numeric: tabular-nums;
+  padding: 2px 2px var(--sp-1);
+  border-bottom: 1px solid var(--line);
+}
+.summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.record {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 6px;
+  border-radius: var(--r-md);
+}
+.record:hover {
+  background: var(--bg-elev2);
+}
+
+.rName {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats {
+  display: flex;
+  gap: var(--sp-2);
+  font-size: 13px;
+  color: var(--text-sec);
+  font-variant-numeric: tabular-nums;
+}
+.stats span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.rEdit {
+  background: none;
+  border: none;
+  color: var(--text-sec);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--r-sm);
+}
+.rEdit:hover {
+  color: var(--text);
+  background: var(--bg-elev3);
+}
+
+.rDel {
+  background: none;
+  border: none;
+  color: var(--text-ter);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--r-sm);
+}
+.rDel:hover {
+  color: var(--neg);
+  background: var(--bg-elev3);
+}
+
+.addRecord {
+  background: var(--bg-elev2);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  color: var(--text-sec);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px;
+  cursor: pointer;
+}
+.addRecord:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
