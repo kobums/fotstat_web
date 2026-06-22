@@ -1,0 +1,57 @@
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  background: var(--bg-elev2);
+  color: var(--text);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.12s ease;
+}
+.trigger:focus-visible,
+.trigger[aria-expanded="true"] {
+  border-color: var(--accent);
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--text-ter);
+}
+
+.value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.placeholder .value {
+  color: var(--text-ter);
+}
+
+.panel {
+  position: fixed;
+  z-index: 200;
+  background: var(--bg-elev);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+  padding: var(--sp-3);
+  animation: pop 0.12s ease;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
