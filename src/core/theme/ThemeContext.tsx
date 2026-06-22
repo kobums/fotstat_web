@@ -21,9 +21,10 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 const STORAGE_KEY = "fotstat.theme";
 
 function initialTheme(): Theme {
+  if (typeof window === "undefined") return "dark";
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved === "light" || saved === "dark") return saved;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
 }
