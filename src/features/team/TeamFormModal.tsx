@@ -5,6 +5,7 @@ import TextField from "../../components/TextField/TextField";
 import { ApiError } from "../../core/api/client";
 import type { Team } from "../../core/api/types";
 import { useCreateTeam, useUpdateTeam } from "./useTeams";
+import styles from "./TeamFormModal.module.css";
 
 interface Props {
   team?: Team | null;
@@ -42,10 +43,7 @@ export default function TeamFormModal({ team, onClose }: Props) {
 
   return (
     <Modal open title={editing ? "팀 수정" : "팀 추가"} onClose={onClose}>
-      <form
-        onSubmit={onSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: 16 }}
-      >
+      <form onSubmit={onSubmit} className={styles.form}>
         <TextField
           label="팀 이름"
           value={name}

@@ -4,6 +4,7 @@ import Modal from "../../components/Modal/Modal";
 import TextField from "../../components/TextField/TextField";
 import { ApiError } from "../../core/api/client";
 import { useCreateQuarter } from "./useQuarters";
+import styles from "./QuarterFormModal.module.css";
 
 interface Props {
   matchId: number;
@@ -35,10 +36,7 @@ export default function QuarterFormModal({
 
   return (
     <Modal open title={`${nextNumber}쿼터 추가`} onClose={onClose}>
-      <form
-        onSubmit={onSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: 16 }}
-      >
+      <form onSubmit={onSubmit} className={styles.form}>
         <TextField
           label="진행 시간 (분)"
           type="number"

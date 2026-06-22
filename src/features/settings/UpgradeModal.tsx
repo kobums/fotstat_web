@@ -4,6 +4,7 @@ import Modal from "../../components/Modal/Modal";
 import TextField from "../../components/TextField/TextField";
 import { useAuth } from "../../core/auth/AuthContext";
 import { ApiError } from "../../core/api/client";
+import styles from "./UpgradeModal.module.css";
 
 export default function UpgradeModal({ onClose }: { onClose: () => void }) {
   const { upgrade } = useAuth();
@@ -29,13 +30,8 @@ export default function UpgradeModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal open title="정식 계정으로 전환" onClose={onClose}>
-      <form
-        onSubmit={onSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: 16 }}
-      >
-        <p style={{ color: "var(--text-sec)", fontSize: 14, margin: 0 }}>
-          현재 게스트 데이터는 그대로 유지됩니다.
-        </p>
+      <form onSubmit={onSubmit} className={styles.form}>
+        <p className={styles.hint}>현재 게스트 데이터는 그대로 유지됩니다.</p>
         <TextField
           label="이름"
           value={name}
