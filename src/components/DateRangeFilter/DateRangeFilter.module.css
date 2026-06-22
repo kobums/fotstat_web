@@ -1,0 +1,40 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.input {
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  background: var(--bg-elev2);
+  color: var(--text);
+  font-size: 14px;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.tilde {
+  color: var(--text-ter);
+}
+
+.clear {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--bg-elev2);
+  color: var(--text-sec);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.clear:hover {
+  color: var(--text);
+  background: var(--bg-elev3);
+}

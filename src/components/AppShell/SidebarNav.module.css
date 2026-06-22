@@ -1,0 +1,149 @@
+.nav {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--sp-3);
+  gap: var(--sp-2);
+}
+
+.brand {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-align: left;
+  padding: var(--sp-2);
+  cursor: pointer;
+}
+.brand:hover {
+  color: var(--accent);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-ter);
+  padding: var(--sp-2) var(--sp-2) 4px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 10px var(--sp-2);
+  border: none;
+  background: none;
+  border-radius: var(--r-md);
+  color: var(--text-sec);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+.link:hover {
+  background: var(--bg-elev2);
+  color: var(--text);
+}
+
+.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.linkIcon {
+  flex-shrink: 0;
+}
+
+.teamName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subNav {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 2px 0 4px 18px;
+  padding-left: 8px;
+  border-left: 1px solid var(--line);
+}
+
+.subLink {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 8px var(--sp-2);
+  border-radius: var(--r-md);
+  color: var(--text-sec);
+  font-size: 13px;
+  font-weight: 600;
+}
+.subLink:hover {
+  background: var(--bg-elev2);
+  color: var(--text);
+}
+
+.subActive {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+  border-top: 1px solid var(--line);
+  margin-top: var(--sp-2);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-elev3);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.accountText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.accountName {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.accountMail {
+  font-size: 11px;
+  color: var(--text-ter);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
