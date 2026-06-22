@@ -1,0 +1,118 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  max-width: var(--content-max);
+  width: 100%;
+  margin: 0 auto;
+}
+
+.brand {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.hero {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(40px, 9vw, 96px) var(--sp-4) var(--sp-5);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.kicker {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.title {
+  font-size: clamp(30px, 6vw, 52px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  font-size: clamp(15px, 2.2vw, 18px);
+  color: var(--text-sec);
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+.cta {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.features {
+  max-width: var(--content-max);
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--sp-4) var(--sp-4) 64px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--sp-3);
+}
+
+.feature {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.featureIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-lg);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.featureTitle {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.featureDesc {
+  font-size: 14px;
+  color: var(--text-sec);
+  line-height: 1.55;
+}
+
+.footer {
+  margin-top: auto;
+  padding: var(--sp-4);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-ter);
+  border-top: 1px solid var(--line);
+}
