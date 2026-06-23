@@ -58,13 +58,22 @@ QueryClient 래퍼). jsdom 환경, `restoreMocks: true`.
 - ✅ 페이지 단위 통합(라우팅) — `routes.tsx`의 실제 라우트 트리를 `createMemoryRouter` + 전체 프로바이더로 마운트. 랜딩, `RequireAuth` 가드(미인증→`/login`), catch-all(미인증→`/`, 인증→`/myteam`), 인증 후 팀 목록 렌더(MSW), 팀 카드 클릭 시 상세 경로 이동
 - ✅ 등번호 검증 — `validatePlayerForm` 순수 함수로 추출, 1~99 정수·빈/0/음수/비정수/지수/100+ 거부 (controlled number-input의 UI 재현 한계를 순수 함수 테스트로 우회)
 
-### Phase 3 — E2E 핵심 플로우 (예정, 백엔드 필요)
+### Phase 3 — E2E 핵심 플로우 ✅ 진행 중 (Playwright)
 
-Playwright로 실제 사용자 시나리오를 "스모크"로 소수만 유지.
+Playwright로 실제 브라우저에서 사용자 시나리오를 "스모크"로 소수만 유지한다.
+구성: `playwright.config.ts`(전용 포트 5174에서 dev 서버 자동 기동), `e2e/`(스펙),
+`e2e/fixtures/mockApi.ts`(백엔드 origin `127.0.0.1:8009`를 `page.route`로 인터셉트하는
+인메모리 모킹 — **실 백엔드 불필요**). 실행: `npm run e2e` (UI 모드 `npm run e2e:ui`).
 
-- 로그인 → 팀 생성 → 경기 추가 → 쿼터/기록 입력 → 통계 화면 확인
+- ✅ 게스트 로그인 → 팀 목록(빈 상태) 진입
+- ✅ 게스트 로그인 → 팀 생성 → 목록에 반영
+- ⬜ 후속: 선수 추가, 경기 추가 → 쿼터/기록 입력 → 통계 화면 확인 (모킹 fixture 확장)
 
-E2E는 느리고 깨지기 쉬우므로 핵심 happy path만 유지한다.
+> 주의: API 모킹은 백엔드 **origin**(`http://127.0.0.1:8009/**`)만 가로챈다. `**/api/**`로
+> 넓히면 앱 소스 모듈(`/src/core/api/*`)까지 잡혀 앱이 부팅되지 않으니 주의.
+
+E2E는 느리고 깨지기 쉬우므로 핵심 happy path만 유지한다. 단위/컴포넌트 테스트(Vitest)와
+달리 브라우저가 필요하므로 최초 1회 `npx playwright install chromium`이 필요하다.
 
 ## 컨벤션
 
