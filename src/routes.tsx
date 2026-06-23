@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, type RouteObject } from "react-router-dom";
 import RequireAuth from "./core/auth/RequireAuth";
 import CatchAllRedirect from "./core/auth/CatchAllRedirect";
 import AppLayout from "./components/AppShell/AppLayout";
@@ -15,7 +15,8 @@ import MatchDetailPage from "./features/match/MatchDetailPage";
 import TeamStatsPage from "./features/stats/TeamStatsPage";
 import SettingsPage from "./features/settings/SettingsPage";
 
-export const router = createBrowserRouter([
+// Exported so integration tests can mount the same tree under a memory router.
+export const routes: RouteObject[] = [
   { path: "/", element: <LandingPage /> },
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
@@ -50,4 +51,6 @@ export const router = createBrowserRouter([
     ],
   },
   { path: "*", element: <CatchAllRedirect /> },
-]);
+];
+
+export const router = createBrowserRouter(routes);
