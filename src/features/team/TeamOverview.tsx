@@ -15,12 +15,6 @@ import { useMatchResults } from "../match/useMatchResults";
 import { useTeamContext } from "./teamContext";
 import styles from "./TeamOverview.module.css";
 
-const LINKS = [
-  { to: "squad", label: "스쿼드", desc: "선수 관리" },
-  { to: "matches", label: "경기", desc: "경기·기록" },
-  { to: "stats", label: "통계", desc: "팀·선수 통계" },
-];
-
 export default function TeamOverview() {
   const { team } = useTeamContext();
   const navigate = useNavigate();
@@ -141,30 +135,24 @@ export default function TeamOverview() {
           selected={selectedDay}
           onSelect={setSelectedDay}
         />
-        {dayMatches.length > 0 && (
-          <ul className={styles.dayList}>
-            {dayMatches.map((m) => (
-              <li key={m.id}>
-                <button className={styles.dayItem} onClick={() => go(m.id)}>
-                  vs {m.awayname}
-                  <span className={styles.dayTime}>
-                    {formatMatchDate(m.matchdate)}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+        {selectedDay &&
+          (dayMatches.length > 0 ? (
+            <ul className={styles.dayList}>
+              {dayMatches.map((m) => (
+                <li key={m.id}>
+                  <button className={styles.dayItem} onClick={() => go(m.id)}>
+                    vs {m.awayname}
+                    <span className={styles.dayTime}>
+                      {formatMatchDate(m.matchdate)}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.dayEmpty}>이 날은 경기가 없습니다.</p>
+          ))}
       </section>
-
-      <div className={styles.grid}>
-        {LINKS.map((l) => (
-          <button key={l.to} className={styles.card} onClick={() => navigate(l.to)}>
-            <span className={styles.cardLabel}>{l.label}</span>
-            <span className={styles.cardDesc}>{l.desc}</span>
-          </button>
-        ))}
-      </div>
     </div>
   );
 }

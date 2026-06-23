@@ -129,34 +129,14 @@
   color: var(--text-sec);
 }
 
-/* Quick nav */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--sp-2);
-}
-.card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  padding: var(--sp-4);
+/* Empty state when a selected day has no matches */
+.dayEmpty {
+  margin: var(--sp-2) 0 0;
+  padding: var(--sp-3);
   background: var(--bg-elev);
   border: 1px solid var(--line);
-  border-radius: var(--r-xl);
-  cursor: pointer;
-  text-align: left;
-}
-.card:hover {
-  background: var(--bg-elev2);
-  border-color: var(--line-strong);
-}
-.cardLabel {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-}
-.cardDesc {
+  border-radius: var(--r-lg);
   font-size: 13px;
   color: var(--text-sec);
+  text-align: center;
 }
