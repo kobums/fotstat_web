@@ -44,14 +44,22 @@ npm run build && npm run lint
 
 여기까지가 "가성비 80%" 구간.
 
-### Phase 2 — 컴포넌트/훅 테스트 (예정)
+### Phase 2 — 컴포넌트/훅 테스트 ✅ 진행 중
 
-React Testing Library + MSW로 API를 모킹.
+React Testing Library + MSW로 API를 모킹. 공용 인프라는 `src/test/`에 둔다
+(`server.ts` MSW 서버, `setup.ts` 라이프사이클·jsdom 폴리필, `renderHook.tsx`
+QueryClient 래퍼). jsdom 환경, `restoreMocks: true`.
 
-- react-query 데이터 훅 (`useMatches`, `useTeams`, `useQuarters`, `useRecords`) — 로딩/에러/성공
-- 폼 모달 검증 로직 (`MatchFormModal`, `RecordFormModal`, `TeamFormModal`)
-- 디자인 시스템 상호작용 컴포넌트 (`Select`, `DatePicker`, `DateTimePicker`)
-- `core/api/client.ts` — `ApiError` 정규화, 401 → 토큰 제거 + 로그아웃 이벤트
+- ✅ `core/api/client.ts` — 성공 파싱, `ApiError` 정규화, 401 → 토큰 제거 + 로그아웃 이벤트, 에러 envelope, 네트워크 실패, Authorization 헤더 (MSW)
+- ✅ `lib/notifyError.ts` — 401 무시 / 메시지 / 폴백 분기
+- ✅ react-query 훅 — `useTeams`(`useAuth` mock), `useMatches`/`useQuarters`/`useRecords`: 쿼리 성공·파라미터·비활성 게이팅, 뮤테이션(POST body 병합·invalidation), 삭제(`removeQueries` 캐시 제거), `useUpcomingMatches`(파라미터), `usePastMatchesInfinite`(`hasNextPage` 경계)
+- ✅ 폼 모달 — `TeamFormModal`(검증·trim·제출), `PlayerFormModal`(이름 필수·기본 포지션 제출), `RecordFormModal`(Stepper 증가·풀타임·빈 선수 비활성), `MatchFormModal`(상대팀 검증·생성 시 API 날짜 포맷·수정 PUT), `QuarterFormModal`(0/빈 시간 거부·기본 25분 생성)
+- ✅ 디자인 시스템 컴포넌트 — `Select`(클릭/키보드 선택·`onChange`·`aria-selected`), `DatePicker`(달력 열기·날짜 선택·라벨 포맷·min/max 비활성), `DateTimePicker`(날짜 선택 시 시간 유지·시/분 변경·off-step 분 스냅)
+- ⬜ 남은 후보: 페이지 단위 통합 테스트(라우팅 포함), 나머지 디자인 시스템 컴포넌트(`Stepper`·`TextField`·`Modal` 등 단순 컴포넌트)
+
+> 알려진 갭: `PlayerFormModal`의 등번호 비정수/음수 검증은 controlled `<input type="number">`의
+> 중간값 정규화(jsdom) 때문에 UI로 결정적 재현이 어려워 보류. 검증 로직을 순수 함수로
+> 추출하면 단위 테스트로 덮을 수 있음(후속).
 
 ### Phase 3 — E2E 핵심 플로우 (예정, 백엔드 필요)
 
