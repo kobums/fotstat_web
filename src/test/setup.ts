@@ -48,6 +48,8 @@ afterEach(() => {
   cleanup();
   server.resetHandlers();
   localStorage.clear();
+  // Modal locks body scroll; reset it so a test can't leak overflow state.
+  document.body.style.overflow = "";
 });
 
 afterAll(() => server.close());
