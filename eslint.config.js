@@ -24,4 +24,11 @@ export default defineConfig([
       'react-refresh/only-export-components': 'warn',
     },
   },
+  {
+    // Node-run tooling/E2E files: allow node globals (process, etc.).
+    files: ['e2e/**/*.ts', 'playwright.config.ts', 'vite.config.ts', 'vitest.config.ts'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ])
