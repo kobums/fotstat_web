@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Calendar from "../../components/Calendar/Calendar";
+import Calendar, { type DayMatch } from "../../components/Calendar/Calendar";
 import Crest from "../../components/Crest/Crest";
 import ResultPill from "../../components/ResultPill/ResultPill";
 import {
   formatMatchDate,
+  formatMatchTime,
   isUpcoming,
   parseMatchDate,
   toDayKey,
@@ -34,6 +35,23 @@ export default function TeamOverview() {
     () => new Set(list.map((m) => toDayKey(m.matchdate)).filter(Boolean)),
     [list],
   );
+
+  const dayInfo = useMemo(() => {
+    const sorted = [...list].sort(
+      (a, b) =>
+        (parseMatchDate(a.matchdate)?.getTime() ?? 0) -
+        (parseMatchDate(b.matchdate)?.getTime() ?? 0),
+    );
+    const map = new Map<string, DayMatch[]>();
+    for (const m of sorted) {
+      const key = toDayKey(m.matchdate);
+      if (!key) continue;
+      const entry = map.get(key) ?? [];
+      entry.push({ time: formatMatchTime(m.matchdate), away: m.awayname });
+      map.set(key, entry);
+    }
+    return map;
+  }, [list]);
 
   const upcoming = useMemo(
     () =>
@@ -117,7 +135,12 @@ export default function TeamOverview() {
 
       <section>
         <h3 className={styles.sectionTitle}>일정</h3>
-        <Calendar marked={marked} selected={selectedDay} onSelect={setSelectedDay} />
+        <Calendar
+          marked={marked}
+          info={dayInfo}
+          selected={selectedDay}
+          onSelect={setSelectedDay}
+        />
         {dayMatches.length > 0 && (
           <ul className={styles.dayList}>
             {dayMatches.map((m) => (

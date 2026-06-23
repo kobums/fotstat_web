@@ -49,7 +49,13 @@
 
 .day {
   position: relative;
-  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 58px;
+  padding: 4px;
+  gap: 2px;
   border: none;
   background: none;
   color: var(--text-sec);
@@ -60,6 +66,12 @@
 }
 .day:disabled {
   opacity: 0.85;
+}
+
+.num {
+  align-self: flex-start;
+  padding-left: 2px;
+  line-height: 1.1;
 }
 
 .has {
@@ -76,8 +88,9 @@
 }
 
 .selected.has {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-soft);
+  color: var(--text);
+  outline: 1px solid var(--accent);
 }
 
 .dot {
@@ -90,6 +103,45 @@
   border-radius: 50%;
   background: var(--accent);
 }
-.selected .dot {
-  background: #fff;
+/* Inline match events (time + opponent), Apple-Calendar style. Shown inside
+ * every day cell that has matches, on all screen sizes. */
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  overflow: hidden;
+}
+.event {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 1px 4px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  overflow: hidden;
+}
+.eventTime {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-deep);
+}
+.eventAway {
+  flex: 1;
+  min-width: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Desktop has more room, so give the cells extra height. */
+@media (min-width: 1024px) {
+  .day {
+    min-height: 76px;
+  }
 }

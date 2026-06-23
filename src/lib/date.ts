@@ -71,6 +71,18 @@ export function formatMatchDate(apiDate: string): string {
   return d ? FMT.format(d) : apiDate;
 }
 
+const TIME_FMT = new Intl.DateTimeFormat("ko-KR", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/** "YYYY-MM-DD HH:mm:ss" -> local 24h time only, e.g. "19:00". */
+export function formatMatchTime(apiDate: string): string {
+  const d = parseMatchDate(apiDate);
+  return d ? TIME_FMT.format(d) : apiDate;
+}
+
 export function isUpcoming(apiDate: string, now: Date): boolean {
   const d = parseMatchDate(apiDate);
   return d ? d.getTime() >= now.getTime() : false;

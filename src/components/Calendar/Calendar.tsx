@@ -2,9 +2,18 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import styles from "./Calendar.module.css";
 
+export interface DayMatch {
+  /** Match time, e.g. "19:00". */
+  time: string;
+  /** Opponent team name. */
+  away: string;
+}
+
 interface Props {
   /** Dates with a match, as "YYYY-MM-DD". */
   marked: Set<string>;
+  /** Per-day match summaries keyed by "YYYY-MM-DD", rendered inline in each cell. */
+  info?: Map<string, DayMatch[]>;
   selected: string;
   onSelect: (date: string) => void;
 }
@@ -15,7 +24,7 @@ function ymd(y: number, m: number, d: number): string {
   return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
 
-export default function Calendar({ marked, selected, onSelect }: Props) {
+export default function Calendar({ marked, info, selected, onSelect }: Props) {
   const today = useMemo(() => new Date(), []);
   const [view, setView] = useState(() => ({
     year: today.getFullYear(),
@@ -63,6 +72,8 @@ export default function Calendar({ marked, selected, onSelect }: Props) {
           if (d === null) return <span key={`b${i}`} />;
           const date = ymd(view.year, view.month, d);
           const has = marked.has(date);
+          const dayInfo = has ? info?.get(date) : undefined;
+          const hasEvents = !!dayInfo && dayInfo.length > 0;
           const cls = [
             styles.day,
             has ? styles.has : "",
@@ -76,8 +87,18 @@ export default function Calendar({ marked, selected, onSelect }: Props) {
               onClick={() => onSelect(has && selected === date ? "" : date)}
               disabled={!has}
             >
-              {d}
-              {has && <span className={styles.dot} />}
+              <span className={styles.num}>{d}</span>
+              {has && !hasEvents && <span className={styles.dot} />}
+              {hasEvents && (
+                <span className={styles.events}>
+                  {dayInfo!.map((m, j) => (
+                    <span key={`${m.time}-${m.away}-${j}`} className={styles.event}>
+                      <span className={styles.eventTime}>{m.time}</span>
+                      <span className={styles.eventAway}>{m.away}</span>
+                    </span>
+                  ))}
+                </span>
+              )}
             </button>
           );
         })}
