@@ -55,11 +55,8 @@ QueryClient 래퍼). jsdom 환경, `restoreMocks: true`.
 - ✅ react-query 훅 — `useTeams`(`useAuth` mock), `useMatches`/`useQuarters`/`useRecords`: 쿼리 성공·파라미터·비활성 게이팅, 뮤테이션(POST body 병합·invalidation), 삭제(`removeQueries` 캐시 제거), `useUpcomingMatches`(파라미터), `usePastMatchesInfinite`(`hasNextPage` 경계)
 - ✅ 폼 모달 — `TeamFormModal`(검증·trim·제출), `PlayerFormModal`(이름 필수·기본 포지션 제출), `RecordFormModal`(Stepper 증가·풀타임·빈 선수 비활성), `MatchFormModal`(상대팀 검증·생성 시 API 날짜 포맷·수정 PUT), `QuarterFormModal`(0/빈 시간 거부·기본 25분 생성)
 - ✅ 디자인 시스템 컴포넌트 — `Select`(클릭/키보드 선택·`onChange`·`aria-selected`), `DatePicker`(달력 열기·날짜 선택·라벨 포맷·min/max 비활성), `DateTimePicker`(날짜 선택 시 시간 유지·시/분 변경·off-step 분 스냅), `Stepper`(증감·min/max 클램핑·aria-label), `TextField`(라벨 연결·prop 전달·에러/`aria-invalid`), `Modal`(열림/닫힘·Escape·오버레이/콘텐츠 클릭·body 스크롤 락)
-- ⬜ 남은 후보: 페이지 단위 통합 테스트(라우팅 포함)
-
-> 알려진 갭: `PlayerFormModal`의 등번호 비정수/음수 검증은 controlled `<input type="number">`의
-> 중간값 정규화(jsdom) 때문에 UI로 결정적 재현이 어려워 보류. 검증 로직을 순수 함수로
-> 추출하면 단위 테스트로 덮을 수 있음(후속).
+- ✅ 페이지 단위 통합(라우팅) — `routes.tsx`의 실제 라우트 트리를 `createMemoryRouter` + 전체 프로바이더로 마운트. 랜딩, `RequireAuth` 가드(미인증→`/login`), catch-all(미인증→`/`, 인증→`/myteam`), 인증 후 팀 목록 렌더(MSW), 팀 카드 클릭 시 상세 경로 이동
+- ✅ 등번호 검증 — `validatePlayerForm` 순수 함수로 추출, 1~99 정수·빈/0/음수/비정수/지수/100+ 거부 (controlled number-input의 UI 재현 한계를 순수 함수 테스트로 우회)
 
 ### Phase 3 — E2E 핵심 플로우 (예정, 백엔드 필요)
 
