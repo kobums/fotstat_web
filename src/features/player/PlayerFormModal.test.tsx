@@ -18,10 +18,21 @@ describe("PlayerFormModal", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  // Note: the non-integer/negative jersey-number branch is hard to exercise
-  // deterministically through a controlled <input type="number"> (jsdom/React
-  // sanitize intermediate values like "7."). It would be better covered by
-  // extracting the validation into a pure function — left for a follow-up.
+  // Branch-level number validation (0/negative/non-integer/range) lives in
+  // validatePlayerForm and is unit-tested in playerForm.test.ts. Here we only
+  // confirm the modal surfaces a validation failure and blocks the request.
+  it("rejects an empty jersey number instead of submitting 0", async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    // No POST handler: a leaked request would fail under onUnhandledRequest.
+    renderWithClient(<PlayerFormModal teamId={1} onClose={onClose} />);
+
+    await user.type(screen.getByLabelText("이름"), "손흥민");
+    await user.click(screen.getByRole("button", { name: "추가" }));
+
+    expect(screen.getByText("등번호를 입력해주세요.")).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+  });
 
   it("creates the player with the default position on a valid submit", async () => {
     const user = userEvent.setup();

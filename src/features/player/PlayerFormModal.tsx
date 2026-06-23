@@ -7,6 +7,7 @@ import { ApiError } from "../../core/api/client";
 import type { Player } from "../../core/api/types";
 import { POSITION_OPTIONS } from "../../lib/position";
 import { useCreatePlayer, useUpdatePlayer } from "./usePlayers";
+import { validatePlayerForm, MIN_NUMBER, MAX_NUMBER } from "./playerForm";
 import styles from "./PlayerFormModal.module.css";
 
 interface Props {
@@ -28,13 +29,16 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const trimmed = name.trim();
-    const num = Number(number);
-    if (!trimmed) return setError("선수 이름을 입력해주세요.");
-    if (!Number.isInteger(num) || num < 0) return setError("등번호를 확인해주세요.");
+    const result = validatePlayerForm(name, number);
+    if (!result.ok) return setError(result.error);
     setError(null);
     try {
-      const input = { team: teamId, name: trimmed, number: num, position };
+      const input = {
+        team: teamId,
+        name: result.value.name,
+        number: result.value.number,
+        position,
+      };
       if (editing && player) {
         await update.mutateAsync({ ...input, id: player.id });
       } else {
@@ -60,7 +64,8 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
             label="등번호"
             type="number"
             inputMode="numeric"
-            min={0}
+            min={MIN_NUMBER}
+            max={MAX_NUMBER}
             value={number}
             onChange={(e) => setNumber(e.target.value)}
           />
