@@ -25,6 +25,7 @@ test.describe('team management', () => {
     await page.getByRole('button', { name: '선수 추가' }).click()
     await page.getByLabel('이름').fill('손흥민')
     await page.getByLabel('등번호').fill('7')
+    // exact: don't also match the "선수 추가" toolbar button (substring).
     await page.getByRole('button', { name: '추가', exact: true }).click()
 
     await expect(page.getByRole('dialog')).toBeHidden()

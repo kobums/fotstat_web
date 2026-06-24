@@ -43,12 +43,18 @@ export interface MockSeed {
  * data already present. Returns the mutable state so a spec can inspect it.
  */
 export async function mockApi(page: Page, seed: MockSeed = {}): Promise<MockState> {
+  // Copy the seed arrays so pushes don't mutate the caller's constants.
   const state: MockState = {
-    teams: seed.teams ?? [],
-    players: seed.players ?? [],
-    matches: seed.matches ?? [],
-    nextId: 100,
+    teams: [...(seed.teams ?? [])],
+    players: [...(seed.players ?? [])],
+    matches: [...(seed.matches ?? [])],
+    nextId: 0,
   }
+  // Start new ids above any seeded id to avoid collisions.
+  const seededIds = [...state.teams, ...state.players, ...state.matches].map(
+    (x) => x.id,
+  )
+  state.nextId = Math.max(99, ...seededIds) + 1
 
   await page.route(`${API_ORIGIN}/**`, async (route) => {
     const request = route.request()
@@ -76,7 +82,9 @@ export async function mockApi(page: Page, seed: MockSeed = {}): Promise<MockStat
 
     // --- Teams ---
     if (path === '/team' && method === 'GET') {
-      return json({ code: 'ok', items: state.teams, total: state.teams.length })
+      const userId = Number(url.searchParams.get('user'))
+      const items = state.teams.filter((t) => t.user === userId)
+      return json({ code: 'ok', items, total: items.length })
     }
     if (path === '/team' && method === 'POST') {
       if (!body.name) return json({ code: 'error', message: 'name required' })
@@ -87,6 +95,7 @@ export async function mockApi(page: Page, seed: MockSeed = {}): Promise<MockStat
     const teamDetail = /^\/team\/(\d+)$/.exec(path)
     if (teamDetail && method === 'GET') {
       const team = state.teams.find((t) => t.id === Number(teamDetail[1]))
+      if (!team) return json({ code: 'error', message: 'team not found' })
       return json({ code: 'ok', item: team })
     }
 
@@ -113,8 +122,10 @@ export async function mockApi(page: Page, seed: MockSeed = {}): Promise<MockStat
       // The schedule page asks twice: upcoming (startmatchdate) and past
       // (endmatchdate). Keep it simple and deterministic by serving every
       // match as "past" and nothing as "upcoming".
+      const teamId = Number(url.searchParams.get('team'))
+      const teamMatches = state.matches.filter((m) => m.team === teamId)
       const isUpcoming = url.searchParams.has('startmatchdate')
-      const items = isUpcoming ? [] : state.matches
+      const items = isUpcoming ? [] : teamMatches
       return json({ code: 'ok', items, total: items.length })
     }
     if (path === '/match' && method === 'POST') {
