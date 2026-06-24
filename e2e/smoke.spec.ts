@@ -21,7 +21,8 @@ test.describe('smoke: guest onboarding', () => {
 
     await page.getByRole('button', { name: '팀 만들기' }).click()
     await page.getByLabel('팀 이름').fill('FC 서울')
-    await page.getByRole('button', { name: '추가' }).click()
+    // exact: avoid matching a "… 추가" toolbar button as a substring.
+    await page.getByRole('button', { name: '추가', exact: true }).click()
 
     // The modal closes on success, then the list refetches and renders the card.
     await expect(page.getByRole('dialog')).toBeHidden()

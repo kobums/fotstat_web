@@ -1,5 +1,7 @@
 # fotstat_web
 
+[![CI](https://github.com/kobums/fotstat_web/actions/workflows/ci.yml/badge.svg)](https://github.com/kobums/fotstat_web/actions/workflows/ci.yml)
+
 유소년부터 프로까지 — 팀 단위 축구 경기 기록·통계 앱 **fotstat**의 웹 프론트엔드.
 레퍼런스 디자인은 fotmob. 흑백 기반 다크모드 우선 UI.
 
@@ -33,6 +35,21 @@ npm run lint
 ```
 
 요구 사항: Node 20+ (개발 환경 기준 Node 26).
+
+## 테스트
+
+```bash
+# 단위·컴포넌트·라우팅 테스트 (Vitest + Testing Library + MSW)
+npm test           # watch
+npm run test:run   # 1회 실행 (CI)
+
+# E2E (Playwright, API는 네트워크 모킹 → 실 백엔드 불필요)
+npx playwright install chromium   # 최초 1회
+npm run e2e        # 또는 npm run e2e:ui
+```
+
+push·PR마다 GitHub Actions가 `lint·build·unit`과 `e2e`를 자동 실행한다.
+테스트 전략·범위는 [`TESTING.md`](./TESTING.md) 참고.
 
 ## 환경 변수
 
