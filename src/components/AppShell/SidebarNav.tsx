@@ -3,7 +3,6 @@ import {
   BarChart3,
   CalendarDays,
   Home,
-  LayoutDashboard,
   LogOut,
   Moon,
   Settings,
@@ -19,8 +18,9 @@ import styles from "./SidebarNav.module.css";
 
 const ICON_SIZE = 18;
 
+// The team name link above already goes to the team overview (home), so the
+// sub-nav lists only the team's sections.
 const TEAM_TABS = [
-  { to: "", label: "홈", end: true, Icon: LayoutDashboard },
   { to: "squad", label: "스쿼드", end: false, Icon: Users },
   { to: "matches", label: "경기", end: false, Icon: CalendarDays },
   { to: "stats", label: "통계", end: false, Icon: BarChart3 },
