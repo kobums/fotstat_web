@@ -10,6 +10,7 @@ if (!BASE_URL) {
   );
 }
 const TOKEN_KEY = "fotstat.token";
+const REFRESH_KEY = "fotstat.refresh";
 export const UNAUTHORIZED_EVENT = "fotstat:unauthorized";
 
 export function getToken(): string | null {
@@ -19,6 +20,65 @@ export function getToken(): string | null {
 export function setToken(token: string | null): void {
   if (token) localStorage.setItem(TOKEN_KEY, token);
   else localStorage.removeItem(TOKEN_KEY);
+}
+
+export function getRefreshToken(): string | null {
+  return localStorage.getItem(REFRESH_KEY);
+}
+
+export function setRefreshToken(token: string | null): void {
+  if (token) localStorage.setItem(REFRESH_KEY, token);
+  else localStorage.removeItem(REFRESH_KEY);
+}
+
+// Access JWTs are short-lived (24h); the backend also issues a long-lived
+// refresh token. When a request 401s we exchange the refresh token for a fresh
+// access JWT and retry once, so the session survives access-token expiry instead
+// of bouncing the user to the login screen. Concurrent 401s share one in-flight
+// refresh (coalescing) to avoid a stampede.
+// "refreshed": got a new access token; retry the request.
+// "invalid":   the refresh token is rejected/absent — log the user out.
+// "transient": the refresh endpoint was unreachable or 5xx — keep the tokens
+//              and fail just this request, so a server blip doesn't sign the
+//              user out when their refresh token is still good.
+type RefreshOutcome = "refreshed" | "invalid" | "transient";
+let refreshInFlight: Promise<RefreshOutcome> | null = null;
+
+async function refreshAccessToken(): Promise<RefreshOutcome> {
+  const refresh = getRefreshToken();
+  if (!refresh) return "invalid";
+
+  if (!refreshInFlight) {
+    refreshInFlight = (async (): Promise<RefreshOutcome> => {
+      try {
+        const res = await fetch(buildUrl("/refresh"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh }),
+        });
+        // 5xx is a server-side blip, not a bad token — don't discard the session.
+        if (res.status >= 500) return "transient";
+        if (!res.ok) return "invalid";
+        const json = (await res.json()) as {
+          code?: string;
+          token?: string;
+          refresh?: string;
+        };
+        if (json.code !== "ok" || !json.token) return "invalid";
+        setToken(json.token);
+        // The refresh token is non-rotating but echoed back; persist whatever
+        // the server returns so a future rotation keeps working.
+        if (json.refresh) setRefreshToken(json.refresh);
+        return "refreshed";
+      } catch {
+        // Network failure (offline, DNS, CORS) — transient, keep the tokens.
+        return "transient";
+      } finally {
+        refreshInFlight = null;
+      }
+    })();
+  }
+  return refreshInFlight;
 }
 
 export class ApiError extends Error {
@@ -55,6 +115,7 @@ async function request<T>(
   method: string,
   path: string,
   opts: RequestOptions = {},
+  retry = true,
 ): Promise<T> {
   const headers: Record<string, string> = {};
   const token = getToken();
@@ -81,7 +142,24 @@ async function request<T>(
   }
 
   if (res.status === 401) {
+    // Try a single refresh-and-retry before giving up.
+    if (retry) {
+      const outcome = await refreshAccessToken();
+      if (outcome === "refreshed") {
+        return request<T>(method, path, opts, false);
+      }
+      if (outcome === "transient") {
+        // Couldn't reach the refresh endpoint; keep the session and let the
+        // caller retry later instead of bouncing the user to login.
+        throw new ApiError(
+          "인증 갱신에 일시적으로 실패했습니다. 잠시 후 다시 시도해주세요.",
+          401,
+        );
+      }
+      // "invalid" falls through to a full logout.
+    }
     setToken(null);
+    setRefreshToken(null);
     window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
     throw new ApiError("인증이 만료되었습니다.", 401);
   }

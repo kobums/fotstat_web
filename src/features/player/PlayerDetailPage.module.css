@@ -71,6 +71,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+.birth {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-ter);
+  font-variant-numeric: tabular-nums;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));

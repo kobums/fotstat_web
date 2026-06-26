@@ -104,3 +104,17 @@ export function dayKey(d: Date): string {
 export function monthStartKey(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-01`;
 }
+
+/** Completed years from a "YYYY-MM-DD" birthdate to today, or null if blank/invalid. */
+export function ageFrom(birthdate: string): number | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthdate);
+  if (!m) return null;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const now = new Date();
+  let age = now.getFullYear() - y;
+  // Subtract a year if this year's birthday hasn't happened yet.
+  if (now.getMonth() + 1 < mo || (now.getMonth() + 1 === mo && now.getDate() < d)) {
+    age -= 1;
+  }
+  return age >= 0 && age < 150 ? age : null;
+}

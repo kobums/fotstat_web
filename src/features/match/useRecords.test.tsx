@@ -42,8 +42,23 @@ describe("useCreateRecord", () => {
     );
 
     const { result } = renderHookWithClient(() => useCreateRecord(7));
-    await result.current.mutateAsync({ player: 2, min: 20, goal: 1, assist: 0 });
+    await result.current.mutateAsync({
+      player: 2,
+      min: 20,
+      goal: 1,
+      assist: 0,
+      yellowcard: 0,
+      redcard: 0,
+    });
 
-    expect(body).toEqual({ quarter: 7, player: 2, min: 20, goal: 1, assist: 0 });
+    expect(body).toEqual({
+      quarter: 7,
+      player: 2,
+      min: 20,
+      goal: 1,
+      assist: 0,
+      yellowcard: 0,
+      redcard: 0,
+    });
   });
 });

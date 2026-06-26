@@ -23,6 +23,8 @@ export function useCreateRecord(quarterId: number) {
       min: number;
       goal: number;
       assist: number;
+      yellowcard: number;
+      redcard: number;
     }) => recordApi.create({ quarter: quarterId, ...input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.records(quarterId) }),
   });
@@ -36,6 +38,8 @@ export function useUpdateRecord(quarterId: number) {
       min: number;
       goal: number;
       assist: number;
+      yellowcard: number;
+      redcard: number;
     }) => recordApi.updateStats(input),
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.records(quarterId) }),
   });

@@ -10,6 +10,19 @@
   gap: var(--sp-3);
 }
 
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-sec);
+}
+
 .error {
   font-size: 13px;
   color: var(--neg);

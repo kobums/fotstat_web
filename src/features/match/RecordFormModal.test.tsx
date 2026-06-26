@@ -50,7 +50,15 @@ describe("RecordFormModal", () => {
     await user.click(screen.getByRole("button", { name: "추가" }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(body).toEqual({ quarter: 7, player: 2, min: 0, goal: 1, assist: 0 });
+    expect(body).toEqual({
+      quarter: 7,
+      player: 2,
+      min: 0,
+      goal: 1,
+      assist: 0,
+      yellowcard: 0,
+      redcard: 0,
+    });
   });
 
   it("'풀타임 채우기' sets minutes to the quarter duration", async () => {
