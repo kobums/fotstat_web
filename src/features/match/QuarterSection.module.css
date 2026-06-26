@@ -120,6 +120,20 @@
   gap: 3px;
 }
 
+.yellowCard,
+.redCard {
+  display: inline-block;
+  width: 9px;
+  height: 12px;
+  border-radius: 2px;
+}
+.yellowCard {
+  background: var(--yellow);
+}
+.redCard {
+  background: var(--neg);
+}
+
 .rEdit {
   background: none;
   border: none;

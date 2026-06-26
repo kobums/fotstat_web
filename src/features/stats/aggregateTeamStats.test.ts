@@ -8,7 +8,7 @@ function quarter(p: Partial<Quarter> & Pick<Quarter, "id" | "match">): Quarter {
 function record(
   p: Partial<MatchRecord> & Pick<MatchRecord, "id" | "quarter" | "player">,
 ): MatchRecord {
-  return { min: 0, goal: 0, assist: 0, ...p };
+  return { min: 0, goal: 0, assist: 0, yellowcard: 0, redcard: 0, ...p };
 }
 function player(p: Partial<Player> & Pick<Player, "id" | "name">): Player {
   return { team: 1, number: 0, position: "CM", ...p };

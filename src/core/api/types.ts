@@ -25,6 +25,8 @@ export interface Player {
   team: number;
   name: string;
   number: number;
+  /** Optional date of birth, "YYYY-MM-DD" or "" when unset. */
+  birthdate?: string;
   position: string;
   createddate?: string;
   updateddate?: string;
@@ -59,6 +61,8 @@ export interface MatchRecord {
   min: number;
   goal: number;
   assist: number;
+  yellowcard: number;
+  redcard: number;
   createddate?: string;
   updateddate?: string;
 }
@@ -68,6 +72,8 @@ export interface MatchRecord {
 export interface AuthResponse {
   code: "ok" | "error";
   token?: string;
+  /** Long-lived refresh token; used to renew `token` after it expires. */
+  refresh?: string;
   user?: User;
   message?: string;
 }

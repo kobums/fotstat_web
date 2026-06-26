@@ -7,7 +7,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ApiError, UNAUTHORIZED_EVENT, setToken } from "../api/client";
+import {
+  ApiError,
+  UNAUTHORIZED_EVENT,
+  setRefreshToken,
+  setToken,
+} from "../api/client";
 import { authApi } from "../api/endpoints";
 import type { AuthResponse, User } from "../api/types";
 
@@ -45,12 +50,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new ApiError(res.message ?? "로그인에 실패했습니다.", 400);
     }
     setToken(res.token);
+    // Persist the refresh token so the session can be renewed silently after the
+    // short-lived access JWT expires (otherwise the user is bounced to login).
+    setRefreshToken(res.refresh ?? null);
     localStorage.setItem(USER_KEY, JSON.stringify(res.user));
     setUser(res.user);
   }, []);
 
   const clearAuth = useCallback(() => {
     setToken(null);
+    setRefreshToken(null);
     localStorage.removeItem(USER_KEY);
     setUser(null);
   }, []);

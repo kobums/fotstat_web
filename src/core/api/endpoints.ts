@@ -59,6 +59,8 @@ export interface PlayerInput {
   team: number;
   name: string;
   number: number;
+  /** "YYYY-MM-DD" or "" when unset. */
+  birthdate?: string;
   position: string;
 }
 
@@ -130,12 +132,16 @@ export const recordApi = {
     min: number;
     goal: number;
     assist: number;
+    yellowcard: number;
+    redcard: number;
   }) => api.post<CodeResponse>("/record", input),
   updateStats: (input: {
     id: number;
     min: number;
     goal: number;
     assist: number;
+    yellowcard: number;
+    redcard: number;
   }) => api.put<CodeResponse>("/record/stats", input),
   remove: (id: number) => api.del<CodeResponse>("/record", { id }),
 };

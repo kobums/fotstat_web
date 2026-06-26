@@ -37,6 +37,8 @@ export default function RecordFormModal({
   const [min, setMin] = useState(record?.min ?? 0);
   const [goal, setGoal] = useState(record?.goal ?? 0);
   const [assist, setAssist] = useState(record?.assist ?? 0);
+  const [yellowcard, setYellowcard] = useState(record?.yellowcard ?? 0);
+  const [redcard, setRedcard] = useState(record?.redcard ?? 0);
   const [error, setError] = useState<string | null>(null);
 
   const create = useCreateRecord(quarterId);
@@ -48,9 +50,23 @@ export default function RecordFormModal({
     setError(null);
     try {
       if (editing && record) {
-        await update.mutateAsync({ id: record.id, min, goal, assist });
+        await update.mutateAsync({
+          id: record.id,
+          min,
+          goal,
+          assist,
+          yellowcard,
+          redcard,
+        });
       } else {
-        await create.mutateAsync({ player: playerId, min, goal, assist });
+        await create.mutateAsync({
+          player: playerId,
+          min,
+          goal,
+          assist,
+          yellowcard,
+          redcard,
+        });
       }
       onClose();
     } catch (err) {
@@ -86,6 +102,18 @@ export default function RecordFormModal({
           <Stepper label="출전(분)" value={min} onChange={setMin} max={200} />
           <Stepper label="골" value={goal} onChange={setGoal} max={99} />
           <Stepper label="어시스트" value={assist} onChange={setAssist} max={99} />
+          <Stepper
+            label="옐로카드"
+            value={yellowcard}
+            onChange={setYellowcard}
+            max={2}
+          />
+          <Stepper
+            label="레드카드"
+            value={redcard}
+            onChange={setRedcard}
+            max={1}
+          />
         </div>
         <button
           type="button"

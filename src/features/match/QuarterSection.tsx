@@ -119,6 +119,18 @@ export default function QuarterSection({
                   <span title="어시스트">
                     <Handshake size={14} /> {r.assist}
                   </span>
+                  {r.yellowcard > 0 && (
+                    <span title="옐로카드">
+                      <span className={styles.yellowCard} aria-hidden />
+                      {r.yellowcard}
+                    </span>
+                  )}
+                  {r.redcard > 0 && (
+                    <span title="레드카드">
+                      <span className={styles.redCard} aria-hidden />
+                      {r.redcard}
+                    </span>
+                  )}
                 </span>
                 <button className={styles.rEdit} onClick={() => openEdit(r)}>
                   수정

@@ -55,6 +55,7 @@ describe("PlayerFormModal", () => {
       team: 1,
       name: "손흥민",
       number: 7,
+      birthdate: "",
       position: "ST",
     });
   });

@@ -3,6 +3,7 @@ import Button from "../../components/Button/Button";
 import Modal from "../../components/Modal/Modal";
 import TextField from "../../components/TextField/TextField";
 import Select from "../../components/Select/Select";
+import DatePicker from "../../components/DatePicker/DatePicker";
 import { ApiError } from "../../core/api/client";
 import type { Player } from "../../core/api/types";
 import { POSITION_OPTIONS } from "../../lib/position";
@@ -22,7 +23,10 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
     player ? String(player.number) : "",
   );
   const [position, setPosition] = useState(player?.position ?? "ST");
+  const [birthdate, setBirthdate] = useState(player?.birthdate ?? "");
   const [error, setError] = useState<string | null>(null);
+  // Births can't be in the future; cap the calendar at today.
+  const today = new Date().toISOString().slice(0, 10);
   const create = useCreatePlayer(teamId);
   const update = useUpdatePlayer(teamId);
   const editing = !!player;
@@ -37,6 +41,7 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
         team: teamId,
         name: result.value.name,
         number: result.value.number,
+        birthdate,
         position,
       };
       if (editing && player) {
@@ -78,6 +83,16 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
               label: g.group,
               options: g.values.map((v) => ({ value: v, label: v })),
             }))}
+          />
+        </div>
+        <div className={styles.field}>
+          <span className={styles.label}>생년월일</span>
+          <DatePicker
+            value={birthdate}
+            onChange={setBirthdate}
+            max={today}
+            placeholder="생년월일 (선택)"
+            aria-label="생년월일"
           />
         </div>
         {error && <div className={styles.error}>{error}</div>}

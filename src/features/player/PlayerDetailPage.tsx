@@ -6,6 +6,7 @@ import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import PosChip from "../../components/PosChip/PosChip";
 import StatTile from "../../components/StatTile/StatTile";
 import { ErrorView, LoadingView } from "../../components/StateView/StateView";
+import { ageFrom } from "../../lib/date";
 import { useTeamStats } from "../stats/useTeamStats";
 import { useDeletePlayer, usePlayers } from "./usePlayers";
 import PlayerFormModal from "./PlayerFormModal";
@@ -87,6 +88,13 @@ export default function PlayerDetailPage() {
                   <span className={styles.number}>#{player.number}</span>
                   <PosChip position={player.position} />
                 </div>
+                {player.birthdate && (
+                  <div className={styles.birth}>
+                    {player.birthdate.replace(/-/g, ".")}
+                    {ageFrom(player.birthdate) !== null &&
+                      ` (만 ${ageFrom(player.birthdate)}세)`}
+                  </div>
+                )}
               </div>
             </section>
 
