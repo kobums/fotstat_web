@@ -91,9 +91,17 @@ export function useTeamStats(
   });
 
   const isLoading =
-    players.isLoading || matches.isLoading || quarters.isLoading || records.isLoading;
+    players.isLoading ||
+    matches.isLoading ||
+    injuries.isLoading ||
+    quarters.isLoading ||
+    records.isLoading;
   const isError =
-    players.isError || matches.isError || quarters.isError || records.isError;
+    players.isError ||
+    matches.isError ||
+    injuries.isError ||
+    quarters.isError ||
+    records.isError;
 
   const aggregate = useMemo(
     () =>

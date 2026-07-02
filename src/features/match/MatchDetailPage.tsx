@@ -90,8 +90,11 @@ export default function MatchDetailPage() {
     [quarterList],
   );
 
-  const loading = match.isLoading || players.isLoading || quarters.isLoading;
-  const error = match.isError || players.isError || quarters.isError;
+  // injuries가 빠지면 로딩 중 잠깐 부상 선수가 선택 가능해 보이고, 실패해도 무음이 된다
+  const loading =
+    match.isLoading || players.isLoading || quarters.isLoading || injuries.isLoading;
+  const error =
+    match.isError || players.isError || quarters.isError || injuries.isError;
 
   return (
     <div className={styles.page}>

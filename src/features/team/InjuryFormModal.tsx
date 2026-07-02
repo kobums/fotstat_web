@@ -52,7 +52,8 @@ export default function InjuryFormModal({
     e.preventDefault();
     if (!player) return setError("선수를 선택해주세요.");
     if (!startdate) return setError("발생일을 선택해주세요.");
-    if (hasReturned && returndate && returndate < startdate)
+    if (hasReturned && !returndate) return setError("복귀일을 선택해주세요.");
+    if (hasReturned && returndate < startdate)
       return setError("복귀일은 발생일 이후여야 합니다.");
     setError(null);
     const input = {

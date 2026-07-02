@@ -3,6 +3,7 @@
 // so comparing the leading 10 chars lexicographically orders them correctly.
 
 import type { Injury, Match } from "../core/api/types";
+import { today } from "./date";
 
 /** returndate empty ("") means the player is still injured. */
 export function isActiveInjury(injury: Injury): boolean {
@@ -35,20 +36,32 @@ export function injuredPlayerIdsOn(
   return ids;
 }
 
-/** How many of `matches` fall inside this single injury spell. */
-export function absentGamesForInjury(injury: Injury, matches: Match[]): number {
-  return matches.filter((m) => injuryCoversMatch(injury, m.matchdate)).length;
+/**
+ * How many of `matches` fall inside this single injury spell.
+ * 아직 열리지 않은 미래 경기는 "결장"이 아니므로 `until`(기본 오늘)까지만 센다.
+ */
+export function absentGamesForInjury(
+  injury: Injury,
+  matches: Match[],
+  until: string = today(),
+): number {
+  return matches.filter(
+    (m) => day(m.matchdate) <= until && injuryCoversMatch(injury, m.matchdate),
+  ).length;
 }
 
-/** How many of `matches` fall inside any injury spell for `playerId`. */
+/** How many of `matches` fall inside any injury spell for `playerId`. 미래 경기 제외. */
 export function absentGamesFor(
   playerId: number,
   injuries: Injury[],
   matches: Match[],
+  until: string = today(),
 ): number {
   const spells = injuries.filter((i) => i.player === playerId);
   if (spells.length === 0) return 0;
-  return matches.filter((m) =>
-    spells.some((i) => injuryCoversMatch(i, m.matchdate)),
+  return matches.filter(
+    (m) =>
+      day(m.matchdate) <= until &&
+      spells.some((i) => injuryCoversMatch(i, m.matchdate)),
   ).length;
 }
