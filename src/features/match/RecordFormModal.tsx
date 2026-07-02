@@ -14,6 +14,8 @@ interface Props {
   players: Player[];
   /** Players already recorded in this quarter (excluded when creating). */
   takenPlayerIds: Set<number>;
+  /** Players injured on this match date (excluded when creating). */
+  injuredPlayerIds?: Set<number>;
   record?: MatchRecord | null;
   onClose: () => void;
 }
@@ -23,13 +25,17 @@ export default function RecordFormModal({
   quarterDuration,
   players,
   takenPlayerIds,
+  injuredPlayerIds,
   record,
   onClose,
 }: Props) {
   const editing = !!record;
+  // 신규 기록 시: 이미 기록된 선수와 이 경기일에 부상 중인 선수는 제외한다.
   const selectable = editing
     ? players
-    : players.filter((p) => !takenPlayerIds.has(p.id));
+    : players.filter(
+        (p) => !takenPlayerIds.has(p.id) && !injuredPlayerIds?.has(p.id),
+      );
 
   const [playerId, setPlayerId] = useState<number>(
     record?.player ?? selectable[0]?.id ?? 0,
@@ -99,16 +105,30 @@ export default function RecordFormModal({
         )}
 
         <div className={styles.steppers}>
-          <Stepper label="출전(분)" value={min} onChange={setMin} max={200} />
-          <Stepper label="골" value={goal} onChange={setGoal} max={99} />
-          <Stepper label="어시스트" value={assist} onChange={setAssist} max={99} />
           <Stepper
+            row
+            label="출전(분)"
+            value={min}
+            onChange={setMin}
+            max={200}
+          />
+          <Stepper row label="골" value={goal} onChange={setGoal} max={99} />
+          <Stepper
+            row
+            label="어시스트"
+            value={assist}
+            onChange={setAssist}
+            max={99}
+          />
+          <Stepper
+            row
             label="옐로카드"
             value={yellowcard}
             onChange={setYellowcard}
             max={2}
           />
           <Stepper
+            row
             label="레드카드"
             value={redcard}
             onChange={setRedcard}

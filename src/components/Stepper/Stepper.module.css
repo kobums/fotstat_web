@@ -5,6 +5,14 @@
   gap: 6px;
 }
 
+.wrapRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: var(--sp-3);
+}
+
 .label {
   font-size: 12px;
   font-weight: 700;
