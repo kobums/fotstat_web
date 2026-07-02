@@ -7,4 +7,5 @@ export const qk = {
   match: (id: number) => ["match", id] as const,
   quarters: (matchId: number) => ["quarters", matchId] as const,
   records: (quarterId: number) => ["records", quarterId] as const,
+  injuries: (teamId: number) => ["injuries", teamId] as const,
 };

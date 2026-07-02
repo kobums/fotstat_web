@@ -7,6 +7,7 @@ import { combineLists } from "../../lib/combineQueries";
 import { parseMatchDate } from "../../lib/date";
 import { usePlayers } from "../player/usePlayers";
 import { useMatches } from "../match/useMatches";
+import { useInjuries } from "../team/useInjuries";
 import { aggregateTeamStats } from "./aggregateTeamStats";
 import type { PlayerStat } from "./aggregateTeamStats";
 
@@ -40,6 +41,7 @@ export function useTeamStats(
 ): TeamStatsResult {
   const players = usePlayers(teamId);
   const matches = useMatches(teamId);
+  const injuries = useInjuries(teamId);
   const start = range?.start ?? "";
   const end = range?.end ?? "";
 
@@ -94,8 +96,15 @@ export function useTeamStats(
     players.isError || matches.isError || quarters.isError || records.isError;
 
   const aggregate = useMemo(
-    () => aggregateTeamStats(allQuarters, records.data, players.data ?? []),
-    [allQuarters, records.data, players.data],
+    () =>
+      aggregateTeamStats(
+        allQuarters,
+        records.data,
+        players.data ?? [],
+        injuries.data ?? [],
+        matchList,
+      ),
+    [allQuarters, records.data, players.data, injuries.data, matchList],
   );
 
   return { isLoading, isError, ...aggregate };

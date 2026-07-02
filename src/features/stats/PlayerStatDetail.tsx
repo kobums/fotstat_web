@@ -67,6 +67,9 @@ export default function PlayerStatDetail({ stat, squadAvg, onClose }: Props) {
         <StatTile label="출전(분)" value={stat.min} />
         <StatTile label="공격P" value={stat.goal + stat.assist} sub="골+도움" />
         <StatTile label="경기당 골" value={goalPg.toFixed(2)} />
+        {stat.absentGames > 0 && (
+          <StatTile label="결장" value={stat.absentGames} sub="부상" />
+        )}
       </div>
 
       <div className={styles.cmpCard}>

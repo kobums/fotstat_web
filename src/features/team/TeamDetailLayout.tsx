@@ -10,6 +10,7 @@ const TABS = [
   { to: "squad", label: "스쿼드", end: false },
   { to: "matches", label: "경기", end: false },
   { to: "stats", label: "통계", end: false },
+  { to: "injuries", label: "부상", end: false },
 ];
 
 export default function TeamDetailLayout() {

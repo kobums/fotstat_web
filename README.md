@@ -73,10 +73,10 @@ src/
 ├── features/             # 도메인별 화면 + 데이터 훅
 │   ├── auth/             # 로그인 / 회원가입
 │   ├── landing/          # 비로그인 랜딩
-│   ├── team/             # 팀 목록 · 상세 · 개요
+│   ├── team/             # 팀 목록 · 상세 · 개요 · 부상자 명단(InjuriesSection·InjuryFormModal·useInjuries)
 │   ├── player/           # 스쿼드 · 선수 상세
-│   ├── match/            # 경기 목록 · 상세 · 쿼터/기록 관리
-│   ├── stats/            # 팀 통계 · 랭킹 · 선수 비교
+│   ├── match/            # 경기 목록 · 상세 · 쿼터/기록 관리(부상 선수 기록 차단)
+│   ├── stats/            # 팀 통계 · 랭킹 · 선수 비교 · 결장 집계
 │   └── settings/         # 설정 · 계정 전환
 ├── components/           # 재사용 UI (디자인 시스템)
 │   ├── AppShell/         # 사이드바 + 레이아웃
@@ -94,6 +94,7 @@ src/
 - 모든 API 호출은 `core/api/client.ts`의 fetch 래퍼를 거친다. JWT는 localStorage에 저장되며 `Bearer` 헤더로 자동 첨부, 401 응답 시 토큰을 비우고 전역 로그아웃 이벤트를 발생시킨다.
 - 도메인 데이터는 feature별 `useXxx` 훅(react-query)으로 가져온다. 쿼리 키는 `lib/queryKeys.ts`에 중앙화.
 - 통계는 별도 집계 API가 없어 `matches → quarters → records`를 클라이언트에서 합산한다 (`features/stats/useTeamStats.ts`).
+- 부상은 `injuryApi`(`GET/POST/PUT/DELETE /injury`)로 관리한다. 부상 기간 판정·결장 경기 수 계산은 순수 유틸 `lib/injury.ts`(`injuryCoversMatch`·`injuredPlayerIdsOn`·`absentGamesFor(Injury)`)에 모아 두고, 기록 입력 차단(`match/RecordFormModal`)·부상자 명단·통계 결장에서 재사용한다.
 
 ### 라우팅
 

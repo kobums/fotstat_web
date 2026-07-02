@@ -100,6 +100,11 @@ export function dayKey(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+/** Today as local "YYYY-MM-DD". toISOString() 기반은 UTC라 KST 오전 9시 전에 어제가 된다. */
+export function today(): string {
+  return dayKey(new Date());
+}
+
 /** First day of `d`'s month as "YYYY-MM-01". */
 export function monthStartKey(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-01`;

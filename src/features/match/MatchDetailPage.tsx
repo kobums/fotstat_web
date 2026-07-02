@@ -13,7 +13,9 @@ import { recordApi } from "../../core/api/endpoints";
 import type { MatchRecord } from "../../core/api/types";
 import { qk } from "../../lib/queryKeys";
 import { formatMatchDate } from "../../lib/date";
+import { injuredPlayerIdsOn } from "../../lib/injury";
 import { usePlayers } from "../player/usePlayers";
+import { useInjuries } from "../team/useInjuries";
 import { useDeleteMatch, useMatch } from "./useMatches";
 import { useQuarters } from "./useQuarters";
 import MatchFormModal from "./MatchFormModal";
@@ -30,7 +32,14 @@ export default function MatchDetailPage() {
   const match = useMatch(mId);
   const players = usePlayers(tId);
   const quarters = useQuarters(mId);
+  const injuries = useInjuries(tId);
   const del = useDeleteMatch(tId);
+
+  // 이 경기일에 부상 중인 선수 — 기록 입력에서 제외한다.
+  const injuredPlayerIds = useMemo(
+    () => injuredPlayerIdsOn(injuries.data ?? [], match.data?.matchdate ?? ""),
+    [injuries.data, match.data?.matchdate],
+  );
   const [quarterFormOpen, setQuarterFormOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
@@ -150,6 +159,7 @@ export default function MatchDetailPage() {
                   quarter={q}
                   records={recordsByQuarter.get(q.id) ?? []}
                   players={players.data ?? []}
+                  injuredPlayerIds={injuredPlayerIds}
                 />
               ))}
             </div>

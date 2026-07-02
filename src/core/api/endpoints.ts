@@ -5,6 +5,7 @@ import { api } from "./client";
 import type {
   AuthResponse,
   CodeResponse,
+  Injury,
   ItemResponse,
   ItemsResponse,
   Match,
@@ -144,4 +145,29 @@ export const recordApi = {
     redcard: number;
   }) => api.put<CodeResponse>("/record/stats", input),
   remove: (id: number) => api.del<CodeResponse>("/record", { id }),
+};
+
+// ---- Injury ----
+
+export interface InjuryInput {
+  player: number;
+  /** Injury type/area; "" when unset. */
+  type: string;
+  /** "YYYY-MM-DD" */
+  startdate: string;
+  /** "YYYY-MM-DD" or "" while still injured. */
+  returndate: string;
+  memo: string;
+}
+
+export const injuryApi = {
+  /** All injuries for a team (active + past). returndate "" = still injured. */
+  list: (teamId: number, signal?: AbortSignal) =>
+    api
+      .get<ItemsResponse<Injury>>("/injury", { team: teamId }, signal)
+      .then(items),
+  create: (input: InjuryInput) => api.post<CodeResponse>("/injury", input),
+  update: (injury: InjuryInput & { id: number }) =>
+    api.put<CodeResponse>("/injury", injury),
+  remove: (id: number) => api.del<CodeResponse>("/injury", { id }),
 };
