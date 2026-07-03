@@ -1,4 +1,5 @@
-import type { MatchRecord, Player, Quarter } from "../../core/api/types";
+import type { Injury, Match, MatchRecord, Player, Quarter } from "../../core/api/types";
+import { absentGamesFor } from "../../lib/injury";
 
 export interface PlayerStat {
   id: number;
@@ -9,6 +10,8 @@ export interface PlayerStat {
   min: number;
   goal: number;
   assist: number;
+  /** 부상으로 결장한 경기 수 (집계 기간 내). */
+  absentGames: number;
 }
 
 export interface TeamStatsAggregate {
@@ -29,6 +32,8 @@ export function aggregateTeamStats(
   allQuarters: Quarter[],
   records: MatchRecord[],
   players: Player[],
+  injuries: Injury[] = [],
+  matches: Match[] = [],
 ): TeamStatsAggregate {
   const quarterToMatch = new Map<number, number>();
   allQuarters.forEach((q) => quarterToMatch.set(q.id, q.match));
@@ -93,6 +98,7 @@ export function aggregateTeamStats(
       min: acc?.min ?? 0,
       goal: acc?.goal ?? 0,
       assist: acc?.assist ?? 0,
+      absentGames: absentGamesFor(p.id, injuries, matches),
     };
   });
   playerStats.sort(

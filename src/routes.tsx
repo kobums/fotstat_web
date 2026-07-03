@@ -8,6 +8,7 @@ import RegisterPage from "./features/auth/RegisterPage";
 import TeamListPage from "./features/team/TeamListPage";
 import TeamDetailLayout from "./features/team/TeamDetailLayout";
 import TeamOverview from "./features/team/TeamOverview";
+import InjuriesPage from "./features/team/InjuriesPage";
 import SquadPage from "./features/player/SquadPage";
 import PlayerDetailPage from "./features/player/PlayerDetailPage";
 import MatchListPage from "./features/match/MatchListPage";
@@ -36,6 +37,7 @@ export const routes: RouteObject[] = [
               { path: "squad", element: <SquadPage /> },
               { path: "matches", element: <MatchListPage /> },
               { path: "stats", element: <TeamStatsPage /> },
+              { path: "injuries", element: <InjuriesPage /> },
             ],
           },
           {

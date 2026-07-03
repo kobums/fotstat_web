@@ -1,5 +1,6 @@
 import { NavLink, useMatch, useNavigate } from "react-router-dom";
 import {
+  Bandage,
   BarChart3,
   CalendarDays,
   Home,
@@ -24,6 +25,7 @@ const TEAM_TABS = [
   { to: "squad", label: "스쿼드", end: false, Icon: Users },
   { to: "matches", label: "경기", end: false, Icon: CalendarDays },
   { to: "stats", label: "통계", end: false, Icon: BarChart3 },
+  { to: "injuries", label: "부상", end: false, Icon: Bandage },
 ];
 
 /** Navigation content shared by the desktop sidebar and the mobile drawer. */

@@ -13,6 +13,8 @@ interface Props {
   quarter: Quarter;
   records: MatchRecord[];
   players: Player[];
+  /** Players injured on this match date — excluded from record creation. */
+  injuredPlayerIds: Set<number>;
 }
 
 export default function QuarterSection({
@@ -20,6 +22,7 @@ export default function QuarterSection({
   quarter,
   records,
   players,
+  injuredPlayerIds,
 }: Props) {
   const updateAway = useUpdateAwaygoals(matchId);
   const deleteQuarter = useDeleteQuarter(matchId);
@@ -132,7 +135,16 @@ export default function QuarterSection({
                     </span>
                   )}
                 </span>
-                <button className={styles.rEdit} onClick={() => openEdit(r)}>
+                <button
+                  className={styles.rEdit}
+                  onClick={() => openEdit(r)}
+                  disabled={injuredPlayerIds.has(r.player)}
+                  title={
+                    injuredPlayerIds.has(r.player)
+                      ? "부상 기간 중이라 수정할 수 없습니다"
+                      : undefined
+                  }
+                >
                   수정
                 </button>
                 <button
@@ -158,6 +170,7 @@ export default function QuarterSection({
           quarterDuration={quarter.duration}
           players={players}
           takenPlayerIds={takenPlayerIds}
+          injuredPlayerIds={injuredPlayerIds}
           record={editing}
           onClose={() => setFormOpen(false)}
         />

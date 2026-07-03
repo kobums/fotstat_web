@@ -67,6 +67,21 @@ export interface MatchRecord {
   updateddate?: string;
 }
 
+/** A player's injury spell. `returndate` empty ("") means still injured. */
+export interface Injury {
+  id: number;
+  player: number;
+  /** Injury type/area, e.g. "발목 염좌". "" when unset. */
+  type?: string;
+  /** "YYYY-MM-DD" */
+  startdate?: string;
+  /** "YYYY-MM-DD" or "" while still injured. */
+  returndate?: string;
+  memo?: string;
+  createddate?: string;
+  updateddate?: string;
+}
+
 // ---- Response envelopes (controllers.go) ----
 
 export interface AuthResponse {

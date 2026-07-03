@@ -12,6 +12,7 @@ import {
 } from "../../lib/date";
 import { useMatches } from "../match/useMatches";
 import { useMatchResults } from "../match/useMatchResults";
+import InjuriesSection from "./InjuriesSection";
 import { useTeamContext } from "./teamContext";
 import styles from "./TeamOverview.module.css";
 
@@ -126,6 +127,8 @@ export default function TeamOverview() {
           </div>
         </section>
       )}
+
+      <InjuriesSection teamId={team.id} matches={list} />
 
       <section>
         <h3 className={styles.sectionTitle}>일정</h3>
