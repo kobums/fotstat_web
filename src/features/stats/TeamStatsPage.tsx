@@ -133,12 +133,14 @@ export default function TeamStatsPage() {
               title="득점 순위"
               metric="goal"
               players={stats.players}
+              sub={(p) => `+${p.assist}A`}
               onSelect={setSelected}
             />
             <RankingList
               title="도움 순위"
               metric="assist"
               players={stats.players}
+              sub={(p) => `${p.goal}G`}
               onSelect={setSelected}
             />
             <RankingList
@@ -146,6 +148,7 @@ export default function TeamStatsPage() {
               metric="min"
               unit="′"
               players={stats.players}
+              sub={(p) => `${p.games}경기 · ${p.goal}G ${p.assist}A`}
               onSelect={setSelected}
             />
           </div>
@@ -156,6 +159,7 @@ export default function TeamStatsPage() {
         <PlayerStatDetail
           stat={selected}
           squadAvg={squadAvg}
+          allPlayers={stats.players}
           onClose={() => setSelected(null)}
         />
       )}

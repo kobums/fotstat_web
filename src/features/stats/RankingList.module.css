@@ -45,8 +45,15 @@
   color: var(--text-sec);
 }
 
-.name {
+.info {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name {
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
@@ -54,10 +61,44 @@
   text-overflow: ellipsis;
 }
 
+/* 1위 기록 대비 비례 바 (iOS StatRankRow 미러) */
+.barTrack {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-elev3);
+  overflow: hidden;
+}
+
+.barFill,
+.barFillTop {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--text) 35%, transparent);
+}
+.barFillTop {
+  background: var(--accent);
+}
+
 .value {
   font-size: 16px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* 값 오른쪽 부가 정보 (iOS StatRankRow.subLabel 미러).
+   좁은 화면에서 이름 컬럼을 짓누르지 않도록 최대폭에서 말줄임 처리. */
+.sub {
+  font-size: 11px;
+  color: var(--text-ter);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .more {
