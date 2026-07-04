@@ -4,6 +4,11 @@ import Calendar, { type DayMatch } from "../../components/Calendar/Calendar";
 import Crest from "../../components/Crest/Crest";
 import ResultPill from "../../components/ResultPill/ResultPill";
 import {
+  birthdayAgeOn,
+  birthdayMonthDays,
+  birthdayPlayersOn,
+} from "../../lib/birthday";
+import {
   formatMatchDate,
   formatMatchTime,
   isUpcoming,
@@ -12,6 +17,7 @@ import {
 } from "../../lib/date";
 import { useMatches } from "../match/useMatches";
 import { useMatchResults } from "../match/useMatchResults";
+import { usePlayers } from "../player/usePlayers";
 import InjuriesSection from "./InjuriesSection";
 import { useTeamContext } from "./teamContext";
 import styles from "./TeamOverview.module.css";
@@ -21,6 +27,7 @@ export default function TeamOverview() {
   const navigate = useNavigate();
   const { data: matches } = useMatches(team.id);
   const { results } = useMatchResults(team.id);
+  const { data: players } = usePlayers(team.id);
   const [selectedDay, setSelectedDay] = useState("");
 
   const now = useMemo(() => new Date(), []);
@@ -80,6 +87,13 @@ export default function TeamOverview() {
     [list, selectedDay],
   );
 
+  const squad = useMemo(() => players ?? [], [players]);
+  const birthdayDays = useMemo(() => birthdayMonthDays(squad), [squad]);
+  const dayBirthdays = useMemo(
+    () => (selectedDay ? birthdayPlayersOn(squad, selectedDay) : []),
+    [squad, selectedDay],
+  );
+
   const go = (id: number) => navigate(`/teams/${team.id}/matches/${id}`);
 
   return (
@@ -135,26 +149,42 @@ export default function TeamOverview() {
         <Calendar
           marked={marked}
           info={dayInfo}
+          birthdays={birthdayDays}
           selected={selectedDay}
           onSelect={setSelectedDay}
         />
-        {selectedDay &&
-          (dayMatches.length > 0 ? (
-            <ul className={styles.dayList}>
-              {dayMatches.map((m) => (
-                <li key={m.id}>
-                  <button className={styles.dayItem} onClick={() => go(m.id)}>
-                    vs {m.awayname}
-                    <span className={styles.dayTime}>
-                      {formatMatchDate(m.matchdate)}
-                    </span>
-                  </button>
+        {selectedDay && dayMatches.length > 0 && (
+          <ul className={styles.dayList}>
+            {dayMatches.map((m) => (
+              <li key={m.id}>
+                <button className={styles.dayItem} onClick={() => go(m.id)}>
+                  vs {m.awayname}
+                  <span className={styles.dayTime}>
+                    {formatMatchDate(m.matchdate)}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {selectedDay && dayBirthdays.length > 0 && (
+          <ul className={styles.dayList}>
+            {dayBirthdays.map((p) => {
+              const age = birthdayAgeOn(p.birthdate, selectedDay);
+              return (
+                <li key={p.id} className={styles.birthdayItem}>
+                  🎂 {p.name} 생일
+                  {age !== null && (
+                    <span className={styles.dayTime}>만 {age}세</span>
+                  )}
                 </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={styles.dayEmpty}>이 날은 경기가 없습니다.</p>
-          ))}
+              );
+            })}
+          </ul>
+        )}
+        {selectedDay && dayMatches.length === 0 && dayBirthdays.length === 0 && (
+          <p className={styles.dayEmpty}>이 날은 경기가 없습니다.</p>
+        )}
       </section>
     </div>
   );

@@ -14,6 +14,9 @@ interface Props {
   marked: Set<string>;
   /** Per-day match summaries keyed by "YYYY-MM-DD", rendered inline in each cell. */
   info?: Map<string, DayMatch[]>;
+  /** Opt-in: recurring player-birthday days as "MM-DD" (yearly, any year).
+   *  Matching cells get a small cake marker and become selectable. */
+  birthdays?: Set<string>;
   selected: string;
   onSelect: (date: string) => void;
 }
@@ -24,7 +27,13 @@ function ymd(y: number, m: number, d: number): string {
   return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
 
-export default function Calendar({ marked, info, selected, onSelect }: Props) {
+export default function Calendar({
+  marked,
+  info,
+  birthdays,
+  selected,
+  onSelect,
+}: Props) {
   const today = useMemo(() => new Date(), []);
   const [view, setView] = useState(() => ({
     year: today.getFullYear(),
@@ -72,11 +81,14 @@ export default function Calendar({ marked, info, selected, onSelect }: Props) {
           if (d === null) return <span key={`b${i}`} />;
           const date = ymd(view.year, view.month, d);
           const has = marked.has(date);
+          const isBirthday = !!birthdays?.has(date.slice(5));
+          const clickable = has || isBirthday;
           const dayInfo = has ? info?.get(date) : undefined;
           const hasEvents = !!dayInfo && dayInfo.length > 0;
           const cls = [
             styles.day,
             has ? styles.has : "",
+            isBirthday ? styles.bdayDay : "",
             date === selected ? styles.selected : "",
             date === todayStr ? styles.today : "",
           ].join(" ");
@@ -84,10 +96,17 @@ export default function Calendar({ marked, info, selected, onSelect }: Props) {
             <button
               key={date}
               className={cls}
-              onClick={() => onSelect(has && selected === date ? "" : date)}
-              disabled={!has}
+              onClick={() =>
+                onSelect(clickable && selected === date ? "" : date)
+              }
+              disabled={!clickable}
             >
               <span className={styles.num}>{d}</span>
+              {isBirthday && (
+                <span className={styles.bday} aria-label="선수 생일">
+                  🎂
+                </span>
+              )}
               {has && !hasEvents && <span className={styles.dot} />}
               {hasEvents && (
                 <span className={styles.events}>

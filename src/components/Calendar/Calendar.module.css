@@ -93,6 +93,32 @@
   outline: 1px solid var(--accent);
 }
 
+/* Player-birthday marker: tiny cake in the cell's top-right corner. Kept
+ * separate from match markers (dot/event pills) so both can coexist. */
+.bday {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font-size: 9px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Birthday days are selectable even without a match, but stay subtle:
+ * regular text color, just a pointer + hover like other actionable cells. */
+.bdayDay {
+  cursor: pointer;
+}
+.bdayDay:hover {
+  background: var(--bg-elev2);
+}
+
+.selected.bdayDay {
+  background: var(--accent-soft);
+  color: var(--text);
+  outline: 1px solid var(--accent);
+}
+
 .dot {
   position: absolute;
   bottom: 5px;
