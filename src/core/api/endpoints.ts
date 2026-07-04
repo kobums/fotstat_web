@@ -36,6 +36,8 @@ export const authApi = {
   upgrade: (email: string, password: string, name: string) =>
     api.post<AuthResponse>("/account/upgrade", { email, password, name }),
   deleteAccount: () => api.del<CodeResponse>("/account"),
+  /** 서버의 refresh 토큰 폐기 (POST /logout — iOS Endpoint.logout과 동일). */
+  logout: () => api.post<CodeResponse>("/logout"),
 };
 
 // ---- Team ----

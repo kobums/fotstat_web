@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "lucide-react";
 import AppHeader from "../../components/AppHeader/AppHeader";
 import Button from "../../components/Button/Button";
 import { useAuth } from "../../core/auth/AuthContext";
@@ -11,7 +11,7 @@ import styles from "./SettingsPage.module.css";
 
 export default function SettingsPage() {
   const { user, logout, deleteAccount } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { preference, setPreference } = useTheme();
   const navigate = useNavigate();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -66,17 +66,31 @@ export default function SettingsPage() {
           <h3 className={styles.cardTitle}>화면</h3>
           <div className={styles.segment}>
             <button
-              className={theme === "light" ? styles.segActive : styles.seg}
-              onClick={() => setTheme("light")}
+              className={preference === "system" ? styles.segActive : styles.seg}
+              onClick={() => setPreference("system")}
+            >
+              <Monitor size={16} /> 시스템
+            </button>
+            <button
+              className={preference === "light" ? styles.segActive : styles.seg}
+              onClick={() => setPreference("light")}
             >
               <Sun size={16} /> 라이트
             </button>
             <button
-              className={theme === "dark" ? styles.segActive : styles.seg}
-              onClick={() => setTheme("dark")}
+              className={preference === "dark" ? styles.segActive : styles.seg}
+              onClick={() => setPreference("dark")}
             >
               <Moon size={16} /> 다크
             </button>
+          </div>
+        </section>
+
+        <section className={styles.card}>
+          <h3 className={styles.cardTitle}>앱 정보</h3>
+          <div className={styles.kv}>
+            <span className={styles.k}>버전</span>
+            <span className={styles.v}>v{__APP_VERSION__}</span>
           </div>
         </section>
 
