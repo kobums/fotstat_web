@@ -17,6 +17,8 @@ import styles from "./InjuryFormModal.module.css";
 interface Props {
   teamId: number;
   players: Player[];
+  /** 현재 부상 중인 선수 id — 실수 중복 등록을 줄이기 위해 표시하고 기본 선택에서 제외 */
+  injuredPlayerIds: Set<number>;
   injury?: Injury | null;
   onClose: () => void;
 }
@@ -24,12 +26,16 @@ interface Props {
 export default function InjuryFormModal({
   teamId,
   players,
+  injuredPlayerIds,
   injury,
   onClose,
 }: Props) {
   const editing = !!injury;
   const [player, setPlayer] = useState<number>(
-    injury?.player ?? players[0]?.id ?? 0,
+    injury?.player ??
+      players.find((p) => !injuredPlayerIds.has(p.id))?.id ??
+      players[0]?.id ??
+      0,
   );
   const [type, setType] = useState(injury?.type ?? "");
   const [startdate, setStartdate] = useState(
@@ -98,7 +104,7 @@ export default function InjuryFormModal({
             onChange={(v) => setPlayer(Number(v))}
             options={players.map((p) => ({
               value: p.id,
-              label: `${p.number}. ${p.name}`,
+              label: `${p.number}. ${p.name}${injuredPlayerIds.has(p.id) ? " · 부상 중" : ""}`,
             }))}
           />
         )}
