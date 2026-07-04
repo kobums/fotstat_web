@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config'
+import pkg from './package.json'
 
 // Vitest config is kept separate from vite.config.ts: Vite 8 (rolldown) and the
 // Vite copy bundled by Vitest have incompatible plugin types, so merging them
@@ -6,6 +7,10 @@ import { defineConfig } from 'vitest/config'
 // transformer (Vite 8 default) already compiles the automatic JSX runtime, so
 // component tests need no explicit React import.
 export default defineConfig({
+  define: {
+    // vite.config.ts와 동일하게 주입 — SettingsPage 등이 테스트에서도 렌더되도록
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   test: {
     // Tests import { describe, it, expect } explicitly rather than relying on
     // globals. jsdom is used everywhere: Phase 1 pure tests run fine under it,

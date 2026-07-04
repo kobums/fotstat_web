@@ -129,6 +129,21 @@
   color: var(--text-sec);
 }
 
+/* Birthday rows under the calendar: same card look as .dayItem, but static. */
+.birthdayItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
+}
+
 /* Empty state when a selected day has no matches */
 .dayEmpty {
   margin: var(--sp-2) 0 0;

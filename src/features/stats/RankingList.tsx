@@ -10,6 +10,8 @@ interface Props {
   metric: Metric;
   unit?: string;
   players: PlayerStat[];
+  /** 값 오른쪽의 부가 정보 (iOS StatRankRow.subLabel 미러 — 예: "3경기 · 2G 1A"). */
+  sub?: (p: PlayerStat) => string;
   onSelect: (p: PlayerStat) => void;
 }
 
@@ -20,6 +22,7 @@ export default function RankingList({
   metric,
   unit = "",
   players,
+  sub,
   onSelect,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
@@ -37,6 +40,8 @@ export default function RankingList({
 
   if (top.length === 0) return null;
   const shown = expanded ? ranked : top;
+  // 비례 바의 기준값 — 1위 기록 (iOS StatRankRow와 동일)
+  const maxVal = Math.max(ranked[0]?.[metric] ?? 0, 1);
 
   return (
     <section className={styles.card}>
@@ -48,11 +53,24 @@ export default function RankingList({
               {/* 기록이 없는 선수는 순위가 아니라 동률 0이므로 번호 대신 - */}
               <span className={styles.rank}>{p[metric] > 0 ? i + 1 : "-"}</span>
               <PlayerAvatar number={p.number} position={p.position} size={30} />
-              <span className={styles.name}>{p.name}</span>
+              <span className={styles.info}>
+                <span className={styles.name}>{p.name}</span>
+                <span className={styles.barTrack} aria-hidden>
+                  <span
+                    className={
+                      i === 0 && p[metric] > 0
+                        ? styles.barFillTop
+                        : styles.barFill
+                    }
+                    style={{ width: `${(p[metric] / maxVal) * 100}%` }}
+                  />
+                </span>
+              </span>
               <span className={styles.value}>
                 {p[metric]}
                 {unit}
               </span>
+              {sub && <span className={styles.sub}>{sub(p)}</span>}
             </button>
           </li>
         ))}

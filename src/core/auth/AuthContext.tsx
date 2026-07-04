@@ -101,6 +101,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearAuth();
   }, [clearAuth]);
 
+  // 명시적 로그아웃: 서버 refresh 토큰 폐기 요청을 보내기만 하고 기다리지 않는다
+  // (베스트 에포트 — 실패 무시). 토큰은 요청 생성 시점에 헤더에 담기므로
+  // 직후의 clearAuth와 경쟁하지 않는다.
+  const logout = useCallback(() => {
+    void authApi.logout().catch(() => {});
+    clearAuth();
+  }, [clearAuth]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -109,10 +117,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       loginGuest,
       upgrade,
-      logout: clearAuth,
+      logout,
       deleteAccount,
     }),
-    [user, loginEmail, register, loginGuest, upgrade, clearAuth, deleteAccount],
+    [user, loginEmail, register, loginGuest, upgrade, logout, deleteAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

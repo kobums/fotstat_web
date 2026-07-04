@@ -3,8 +3,10 @@ import { Goal, Handshake, Users, X } from "lucide-react";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import Stepper from "../../components/Stepper/Stepper";
 import type { MatchRecord, Player, Quarter } from "../../core/api/types";
+import { rebalanceAssists } from "../../lib/assistCap";
+import { notifyError } from "../../lib/notifyError";
 import { useDeleteQuarter, useUpdateAwaygoals } from "./useQuarters";
-import { useDeleteRecord } from "./useRecords";
+import { useDeleteRecord, useUpdateRecord } from "./useRecords";
 import RecordFormModal from "./RecordFormModal";
 import styles from "./QuarterSection.module.css";
 
@@ -27,6 +29,7 @@ export default function QuarterSection({
   const updateAway = useUpdateAwaygoals(matchId);
   const deleteQuarter = useDeleteQuarter(matchId);
   const deleteRecord = useDeleteRecord(quarter.id);
+  const updateRecord = useUpdateRecord(quarter.id);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<MatchRecord | null>(null);
 
@@ -56,6 +59,39 @@ export default function QuarterSection({
     () => new Set(records.map((r) => r.player)),
     [records],
   );
+
+  // 골 기록 삭제로 팀 골 합이 줄면 남은 선수들의 초과 어시스트를 함께 차감
+  // (iOS RecordViewModel.rebalanceAssists 미러 — 어시 합 ≤ 골 합 유지).
+  function handleDeleteRecord(target: MatchRecord) {
+    deleteRecord.mutate(target.id, {
+      onSuccess: () => {
+        const remaining = records.filter((r) => r.id !== target.id);
+        for (const change of rebalanceAssists(
+          remaining.map((r) => ({
+            id: r.id,
+            player: r.player,
+            goal: r.goal,
+            assist: r.assist,
+          })),
+          injuredPlayerIds,
+        )) {
+          const rec = remaining.find((r) => r.id === change.id);
+          if (!rec) continue;
+          updateRecord.mutate(
+            {
+              id: rec.id,
+              min: rec.min,
+              goal: rec.goal,
+              assist: change.assist,
+              yellowcard: rec.yellowcard,
+              redcard: rec.redcard,
+            },
+            { onError: notifyError("어시스트를 다시 조정하지 못했습니다.") },
+          );
+        }
+      },
+    });
+  }
 
   function openCreate() {
     setEditing(null);
@@ -149,7 +185,8 @@ export default function QuarterSection({
                 </button>
                 <button
                   className={styles.rDel}
-                  onClick={() => deleteRecord.mutate(r.id)}
+                  onClick={() => handleDeleteRecord(r)}
+                  disabled={deleteRecord.isPending || updateRecord.isPending}
                   aria-label="기록 삭제"
                 >
                   <X size={14} />
@@ -171,6 +208,7 @@ export default function QuarterSection({
           players={players}
           takenPlayerIds={takenPlayerIds}
           injuredPlayerIds={injuredPlayerIds}
+          records={records}
           record={editing}
           onClose={() => setFormOpen(false)}
         />

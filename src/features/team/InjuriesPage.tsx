@@ -174,6 +174,7 @@ export default function InjuriesPage() {
         <InjuryFormModal
           teamId={team.id}
           players={playerList}
+          injuredPlayerIds={new Set(active.map((i) => i.player))}
           injury={editing}
           onClose={() => setFormOpen(false)}
         />
