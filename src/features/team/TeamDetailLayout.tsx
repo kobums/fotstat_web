@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useParams } from "react-router-dom";
+import { NavLink, Outlet, useMatches, useParams } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { LoadingView, ErrorView } from "../../components/StateView/StateView";
 import { useDrawer } from "../../components/AppShell/drawer";
@@ -8,9 +8,10 @@ import styles from "./TeamDetailLayout.module.css";
 const TABS = [
   { to: "", label: "홈", end: true },
   { to: "squad", label: "스쿼드", end: false },
+  { to: "injuries", label: "부상", end: false },
   { to: "matches", label: "경기", end: false },
   { to: "stats", label: "통계", end: false },
-  { to: "injuries", label: "부상", end: false },
+  { to: "report", label: "리포트", end: false },
 ];
 
 export default function TeamDetailLayout() {
@@ -18,6 +19,10 @@ export default function TeamDetailLayout() {
   const id = Number(teamId);
   const { data: team, isLoading, isError, refetch } = useTeam(id);
   const drawer = useDrawer();
+  // 라우트 handle.wide가 켜진 탭(리포트)은 컨텐츠 폭 제한을 해제
+  const wide = useMatches().some(
+    (m) => (m.handle as { wide?: boolean } | undefined)?.wide,
+  );
 
   return (
     <div className={styles.page}>
@@ -45,7 +50,7 @@ export default function TeamDetailLayout() {
         </div>
       </nav>
 
-      <main className={styles.content}>
+      <main className={wide ? `${styles.content} ${styles.wide}` : styles.content}>
         {isLoading && <LoadingView />}
         {isError && (
           <ErrorView message="팀을 불러오지 못했습니다." onRetry={refetch} />

@@ -14,6 +14,7 @@ import PlayerDetailPage from "./features/player/PlayerDetailPage";
 import MatchListPage from "./features/match/MatchListPage";
 import MatchDetailPage from "./features/match/MatchDetailPage";
 import TeamStatsPage from "./features/stats/TeamStatsPage";
+import SeasonReportPage from "./features/stats/SeasonReportPage";
 import SettingsPage from "./features/settings/SettingsPage";
 
 // Exported so integration tests can mount the same tree under a memory router.
@@ -35,9 +36,11 @@ export const routes: RouteObject[] = [
             children: [
               { index: true, element: <TeamOverview /> },
               { path: "squad", element: <SquadPage /> },
+              { path: "injuries", element: <InjuriesPage /> },
               { path: "matches", element: <MatchListPage /> },
               { path: "stats", element: <TeamStatsPage /> },
-              { path: "injuries", element: <InjuriesPage /> },
+              // handle.wide: TeamDetailLayout이 이 탭에서는 컨텐츠 max-width를 해제
+              { path: "report", element: <SeasonReportPage />, handle: { wide: true } },
             ],
           },
           {

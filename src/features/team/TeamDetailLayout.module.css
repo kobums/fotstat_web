@@ -74,3 +74,8 @@
   margin: 0 auto;
   padding: var(--sp-4);
 }
+
+/* 리포트처럼 가로 공간을 넓게 쓰는 탭 (routes.tsx handle.wide) */
+.wide {
+  max-width: none;
+}

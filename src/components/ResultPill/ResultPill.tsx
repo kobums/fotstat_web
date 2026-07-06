@@ -19,17 +19,19 @@ const LABEL: Record<Result, string> = { W: "승", D: "무", L: "패" };
 export default function ResultPill({
   result,
   size = 20,
+  showLabel = false,
 }: {
   result: Result;
   size?: number;
+  showLabel?: boolean; // true면 W/D/L 대신 승/무/패로 표시
 }) {
   return (
     <span
       className={styles.pill}
       style={{ width: size, height: size, background: COLOR[result], fontSize: size * 0.5 }}
-      title={LABEL[result]}
+      title={showLabel ? undefined : LABEL[result]}
     >
-      {result}
+      {showLabel ? LABEL[result] : result}
     </span>
   );
 }

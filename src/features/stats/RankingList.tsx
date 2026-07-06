@@ -12,6 +12,8 @@ interface Props {
   players: PlayerStat[];
   /** 값 오른쪽의 부가 정보 (iOS StatRankRow.subLabel 미러 — 예: "3경기 · 2G 1A"). */
   sub?: (p: PlayerStat) => string;
+  /** true면 처음부터 전체 순위를 펼쳐 보여준다 (리포트 탭). */
+  defaultExpanded?: boolean;
   onSelect: (p: PlayerStat) => void;
 }
 
@@ -23,9 +25,10 @@ export default function RankingList({
   unit = "",
   players,
   sub,
+  defaultExpanded = false,
   onSelect,
 }: Props) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   // 전체 보기는 0인 선수까지 스쿼드 전원 순위를 보여준다
   const ranked = useMemo(
