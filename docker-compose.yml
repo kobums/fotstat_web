@@ -1,0 +1,11 @@
+services:
+  fotstat_web:
+    image: kobums/fotstat_web:${VERSION:-latest}
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fotstat_web
+    ports:
+      - "9009:9009"
+    restart: unless-stopped
