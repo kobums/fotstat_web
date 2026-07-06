@@ -3,6 +3,7 @@ import {
   Bandage,
   BarChart3,
   CalendarDays,
+  FileText,
   Home,
   LogOut,
   Moon,
@@ -23,9 +24,10 @@ const ICON_SIZE = 18;
 // sub-nav lists only the team's sections.
 const TEAM_TABS = [
   { to: "squad", label: "스쿼드", end: false, Icon: Users },
+  { to: "injuries", label: "부상", end: false, Icon: Bandage },
   { to: "matches", label: "경기", end: false, Icon: CalendarDays },
   { to: "stats", label: "통계", end: false, Icon: BarChart3 },
-  { to: "injuries", label: "부상", end: false, Icon: Bandage },
+  { to: "report", label: "리포트", end: false, Icon: FileText },
 ];
 
 /** Navigation content shared by the desktop sidebar and the mobile drawer. */
