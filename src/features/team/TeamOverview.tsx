@@ -17,6 +17,7 @@ import {
 } from "../../lib/date";
 import { useMatches } from "../match/useMatches";
 import { useMatchResults } from "../match/useMatchResults";
+import MatchRowList from "../match/MatchRowList";
 import { usePlayers } from "../player/usePlayers";
 import InjuriesSection from "./InjuriesSection";
 import { useTeamContext } from "./teamContext";
@@ -67,11 +68,18 @@ export default function TeamOverview() {
     [list, now],
   );
   const nextMatch = upcoming[0];
-  const completedCount = results.size;
+
+  // 지난(날짜가 과거인) 경기만 — "최근 경기"·"완료" 집계 기준. 예정 경기에
+  // 쿼터 데이터가 있어도 여기 포함되면 안 된다("지난 경기" 리스트와 동일 기준).
+  const finished = useMemo(
+    () => list.filter((m) => !isUpcoming(m.matchdate, now)),
+    [list, now],
+  );
+  const completedCount = finished.length;
 
   const recent = useMemo(
     () =>
-      list
+      finished
         .filter((m) => results.get(m.id)?.played)
         .sort(
           (a, b) =>
@@ -79,7 +87,7 @@ export default function TeamOverview() {
             (parseMatchDate(a.matchdate)?.getTime() ?? 0),
         )
         .slice(0, 5),
-    [list, results],
+    [finished, results],
   );
 
   const dayMatches = useMemo(
@@ -98,6 +106,8 @@ export default function TeamOverview() {
 
   return (
     <div className={styles.wrap}>
+      {/* 섹션 순서는 iOS 홈 탭과 동일:
+          요약(최근 5경기 포함) → 일정 → 다음 경기 → 부상자 → 최근 경기 리스트 */}
       <section className={styles.hero}>
         <Crest name={team.name} size={64} />
         <div>
@@ -106,43 +116,30 @@ export default function TeamOverview() {
             경기 {list.length} · 예정 {upcoming.length} · 완료 {completedCount}
           </span>
         </div>
-      </section>
-
-      {nextMatch && (
-        <button className={styles.next} onClick={() => go(nextMatch.id)}>
-          <span className={styles.nextLabel}>다음 경기</span>
-          <span className={styles.nextAway}>vs {nextMatch.awayname}</span>
-          <span className={styles.nextDate}>
-            {formatMatchDate(nextMatch.matchdate)}
-          </span>
-        </button>
-      )}
-
-      {recent.length > 0 && (
-        <section className={styles.recent}>
-          <h3 className={styles.sectionTitle}>최근 경기</h3>
-          <div className={styles.pills}>
-            {recent.map((m) => {
-              const r = results.get(m.id)!;
-              return (
-                <button
-                  key={m.id}
-                  className={styles.pillRow}
-                  onClick={() => go(m.id)}
-                  title={`vs ${m.awayname}`}
-                >
-                  <ResultPill result={r.result} size={22} />
-                  <span className={styles.pillScore}>
-                    {r.home}:{r.away}
-                  </span>
-                </button>
-              );
-            })}
+        {recent.length > 0 && (
+          <div className={styles.heroRecent}>
+            <span className={styles.heroRecentLabel}>최근 5경기</span>
+            <div className={styles.pills}>
+              {recent.map((m) => {
+                const r = results.get(m.id)!;
+                return (
+                  <button
+                    key={m.id}
+                    className={styles.pillRow}
+                    onClick={() => go(m.id)}
+                    title={`vs ${m.awayname}`}
+                  >
+                    <ResultPill result={r.result} size={22} />
+                    <span className={styles.pillScore}>
+                      {r.home}:{r.away}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </section>
-      )}
-
-      <InjuriesSection teamId={team.id} matches={list} />
+        )}
+      </section>
 
       <section>
         <h3 className={styles.sectionTitle}>일정</h3>
@@ -186,6 +183,25 @@ export default function TeamOverview() {
           <p className={styles.dayEmpty}>이 날은 경기가 없습니다.</p>
         )}
       </section>
+
+      {nextMatch && (
+        <button className={styles.next} onClick={() => go(nextMatch.id)}>
+          <span className={styles.nextLabel}>다음 경기</span>
+          <span className={styles.nextAway}>vs {nextMatch.awayname}</span>
+          <span className={styles.nextDate}>
+            {formatMatchDate(nextMatch.matchdate)}
+          </span>
+        </button>
+      )}
+
+      <InjuriesSection teamId={team.id} matches={list} />
+
+      {recent.length > 0 && (
+        <section>
+          <h3 className={styles.sectionTitle}>최근 경기</h3>
+          <MatchRowList matches={recent} results={results} onSelect={go} />
+        </section>
+      )}
     </div>
   );
 }
