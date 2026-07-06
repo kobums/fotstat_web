@@ -177,3 +177,26 @@
   color: var(--text);
   border-color: var(--accent);
 }
+
+/* 기록 추가 + 부상 등록을 나란히 배치 */
+.footerActions {
+  display: flex;
+  gap: 8px;
+}
+.footerActions .addRecord {
+  flex: 1;
+}
+
+.addInjury {
+  background: transparent;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  color: var(--neg);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.addInjury:hover {
+  border-color: var(--neg);
+}

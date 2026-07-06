@@ -36,17 +36,19 @@ describe("injuryCoversMatch", () => {
     returndate: "2026-05-25",
   });
 
-  it("경계값 포함: 발생일·복귀일 당일 경기는 결장", () => {
-    expect(injuryCoversMatch(spell, "2026-05-10 15:00:00")).toBe(true);
+  it("발생일 당일 경기는 결장 아님(경기 중 부상 = 그날까지는 뛴 것), 복귀일 당일은 결장", () => {
+    expect(injuryCoversMatch(spell, "2026-05-10 15:00:00")).toBe(false);
+    expect(injuryCoversMatch(spell, "2026-05-11 15:00:00")).toBe(true);
     expect(injuryCoversMatch(spell, "2026-05-25 15:00:00")).toBe(true);
   });
   it("기간 밖 경기는 제외", () => {
     expect(injuryCoversMatch(spell, "2026-05-09 15:00:00")).toBe(false);
     expect(injuryCoversMatch(spell, "2026-05-26 15:00:00")).toBe(false);
   });
-  it("returndate가 비어 있으면(부상 중) 발생일 이후 전부 포함", () => {
+  it("returndate가 비어 있으면(부상 중) 발생일 다음 날부터 전부 포함", () => {
     const open = injury({ id: 2, player: 1, startdate: "2026-05-10" });
     expect(injuryCoversMatch(open, "2030-01-01 15:00:00")).toBe(true);
+    expect(injuryCoversMatch(open, "2026-05-10 15:00:00")).toBe(false);
     expect(injuryCoversMatch(open, "2026-05-09 15:00:00")).toBe(false);
   });
   it("startdate가 없으면 항상 false", () => {
@@ -74,6 +76,7 @@ describe("injuredPlayerIdsOn", () => {
 describe("absentGamesForInjury", () => {
   const matches = [
     match(1, "2026-05-03"),
+    match(5, "2026-05-10"), // 발생일 당일 — 결장으로 세지 않음
     match(2, "2026-05-17"),
     match(3, "2026-06-01"),
     match(4, "2026-08-15"), // 미래(예정) 경기

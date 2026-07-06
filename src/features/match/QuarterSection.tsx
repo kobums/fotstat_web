@@ -17,6 +17,8 @@ interface Props {
   players: Player[];
   /** Players injured on this match date — excluded from record creation. */
   injuredPlayerIds: Set<number>;
+  /** 경기 중 부상 발생 시 이 화면에서 바로 부상을 등록하는 진입점 */
+  onRegisterInjury: () => void;
 }
 
 export default function QuarterSection({
@@ -25,6 +27,7 @@ export default function QuarterSection({
   records,
   players,
   injuredPlayerIds,
+  onRegisterInjury,
 }: Props) {
   const updateAway = useUpdateAwaygoals(matchId);
   const deleteQuarter = useDeleteQuarter(matchId);
@@ -197,9 +200,14 @@ export default function QuarterSection({
         </ul>
       )}
 
-      <button className={styles.addRecord} onClick={openCreate}>
-        + 선수 기록 추가
-      </button>
+      <div className={styles.footerActions}>
+        <button className={styles.addRecord} onClick={openCreate}>
+          + 선수 기록 추가
+        </button>
+        <button className={styles.addInjury} onClick={onRegisterInjury}>
+          부상 등록
+        </button>
+      </div>
 
       {formOpen && (
         <RecordFormModal

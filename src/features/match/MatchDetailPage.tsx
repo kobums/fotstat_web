@@ -12,9 +12,10 @@ import {
 import { recordApi } from "../../core/api/endpoints";
 import type { MatchRecord } from "../../core/api/types";
 import { qk } from "../../lib/queryKeys";
-import { formatMatchDate } from "../../lib/date";
+import { formatMatchDate, today } from "../../lib/date";
 import { injuredPlayerIdsOn } from "../../lib/injury";
 import { usePlayers } from "../player/usePlayers";
+import InjuryFormModal from "../team/InjuryFormModal";
 import { useInjuries } from "../team/useInjuries";
 import { useDeleteMatch, useMatch } from "./useMatches";
 import { useQuarters } from "./useQuarters";
@@ -42,6 +43,7 @@ export default function MatchDetailPage() {
   );
   const [quarterFormOpen, setQuarterFormOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [injuryFormOpen, setInjuryFormOpen] = useState(false);
 
   async function onDelete() {
     if (!match.data) return;
@@ -163,6 +165,7 @@ export default function MatchDetailPage() {
                   records={recordsByQuarter.get(q.id) ?? []}
                   players={players.data ?? []}
                   injuredPlayerIds={injuredPlayerIds}
+                  onRegisterInjury={() => setInjuryFormOpen(true)}
                 />
               ))}
             </div>
@@ -189,6 +192,19 @@ export default function MatchDetailPage() {
           teamId={tId}
           match={match.data}
           onClose={() => setEditOpen(false)}
+        />
+      )}
+
+      {injuryFormOpen && match.data && (
+        <InjuryFormModal
+          teamId={tId}
+          players={players.data ?? []}
+          injuredPlayerIds={injuredPlayerIds}
+          defaultStartdate={
+            // 발생일 = 경기일 프리필. 미래(예정) 경기는 오늘로 clamp
+            [match.data.matchdate.slice(0, 10), today()].sort()[0]
+          }
+          onClose={() => setInjuryFormOpen(false)}
         />
       )}
     </div>
