@@ -6,11 +6,12 @@ import {
   ErrorView,
   LoadingView,
 } from "../../components/StateView/StateView";
-import type { Match } from "../../core/api/types";
-import { formatMatchDate, toApiDateSeconds } from "../../lib/date";
+import { toApiDateSeconds } from "../../lib/date";
 import { useTeamContext } from "../team/teamContext";
 import { usePastMatchesInfinite, useUpcomingMatches } from "./useMatches";
+import { useMatchResultsFor } from "./useMatchResults";
 import MatchFormModal from "./MatchFormModal";
+import MatchRowList from "./MatchRowList";
 import styles from "./MatchListPage.module.css";
 
 export default function MatchListPage() {
@@ -26,6 +27,8 @@ export default function MatchListPage() {
     () => past.data?.pages.flatMap((p) => p.matches) ?? [],
     [past.data],
   );
+  // 결과(점수)는 화면에 실제 렌더링되는 지난 경기만 대상으로 집계
+  const { results } = useMatchResultsFor(pastList);
 
   const isLoading = upcoming.isLoading || past.isLoading;
   const isError = upcoming.isError || past.isError;
@@ -33,19 +36,7 @@ export default function MatchListPage() {
     !isLoading && !isError && upcomingList.length === 0 && pastList.length === 0;
 
   // Edit/delete live on the match detail page; rows just open the match.
-  const renderRow = (m: Match) => (
-    <li key={m.id} className={styles.row}>
-      <button
-        className={styles.rowMain}
-        onClick={() => navigate(`/teams/${team.id}/matches/${m.id}`)}
-      >
-        <div className={styles.rowText}>
-          <span className={styles.away}>vs {m.awayname}</span>
-          <span className={styles.date}>{formatMatchDate(m.matchdate)}</span>
-        </div>
-      </button>
-    </li>
-  );
+  const openMatch = (id: number) => navigate(`/teams/${team.id}/matches/${id}`);
 
   return (
     <div>
@@ -76,13 +67,13 @@ export default function MatchListPage() {
       {upcomingList.length > 0 && (
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>예정된 경기</h3>
-          <ul className={styles.list}>{upcomingList.map(renderRow)}</ul>
+          <MatchRowList matches={upcomingList} onSelect={openMatch} />
         </section>
       )}
       {pastList.length > 0 && (
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>지난 경기</h3>
-          <ul className={styles.list}>{pastList.map(renderRow)}</ul>
+          <MatchRowList matches={pastList} results={results} onSelect={openMatch} />
           {past.hasNextPage && (
             <button
               className={styles.more}
