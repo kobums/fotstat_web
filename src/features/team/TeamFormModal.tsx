@@ -18,6 +18,7 @@ export default function TeamFormModal({ team, onClose }: Props) {
   const [name, setName] = useState(team?.name ?? '')
   const [duration, setDuration] = useState(String(team?.duration ?? 45))
   const [error, setError] = useState<string | null>(null)
+  const [durationError, setDurationError] = useState<string | null>(null)
   const create = useCreateTeam()
   const update = useUpdateTeam()
   const editing = !!team
@@ -29,12 +30,13 @@ export default function TeamFormModal({ team, onClose }: Props) {
       setError('팀 이름을 입력해주세요.')
       return
     }
+    setError(null)
     const dur = Number(duration)
     if (!Number.isInteger(dur) || dur < 1 || dur > 120) {
-      setError('쿼터 기본 시간은 1~120분 사이여야 합니다.')
+      setDurationError('쿼터 기본 시간은 1~120분 사이여야 합니다.')
       return
     }
-    setError(null)
+    setDurationError(null)
     try {
       if (editing && team) {
         await update.mutateAsync({ id: team.id, name: trimmed, duration: dur })
@@ -52,7 +54,7 @@ export default function TeamFormModal({ team, onClose }: Props) {
       <form onSubmit={onSubmit} className={styles.form}>
         <TextField label="팀 이름" value={name} onChange={e => setName(e.target.value)} placeholder="FC 서울" autoFocus error={error ?? undefined} />
         <TextField
-          label="쿼터 기본 시간(분)"
+          label="쿼터 기본 시간 (분)"
           type="number"
           inputMode="numeric"
           min={1}
@@ -60,6 +62,7 @@ export default function TeamFormModal({ team, onClose }: Props) {
           value={duration}
           onChange={e => setDuration(e.target.value)}
           placeholder="45"
+          error={durationError ?? undefined}
         />
         <Button type="submit" loading={create.isPending || update.isPending}>
           {editing ? '저장' : '추가'}
