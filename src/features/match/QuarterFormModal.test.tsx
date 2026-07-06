@@ -22,7 +22,7 @@ describe("QuarterFormModal", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it("creates the quarter with the default 25-minute duration", async () => {
+  it("creates the quarter with the given defaultDuration prefill", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
     let body: unknown = null;
@@ -34,11 +34,23 @@ describe("QuarterFormModal", () => {
     );
 
     renderWithClient(
-      <QuarterFormModal matchId={5} nextNumber={3} onClose={onClose} />,
+      <QuarterFormModal
+        matchId={5}
+        nextNumber={3}
+        defaultDuration={20}
+        onClose={onClose}
+      />,
     );
     await user.click(screen.getByRole("button", { name: "추가" }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(body).toEqual({ match: 5, number: 3, duration: 25 });
+    expect(body).toEqual({ match: 5, number: 3, duration: 20 });
+  });
+
+  it("falls back to 45 minutes when defaultDuration is not given", () => {
+    renderWithClient(
+      <QuarterFormModal matchId={5} nextNumber={3} onClose={vi.fn()} />,
+    );
+    expect(screen.getByLabelText("진행 시간 (분)")).toHaveValue(45);
   });
 });

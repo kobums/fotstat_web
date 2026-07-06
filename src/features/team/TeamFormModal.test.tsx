@@ -24,6 +24,28 @@ describe("TeamFormModal", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  it("blocks submit and marks the duration field when out of 1~120 range", async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    // No POST handler registered: if it submitted, MSW would fail the test.
+    renderWithClient(<TeamFormModal onClose={onClose} />);
+
+    await user.type(screen.getByLabelText("팀 이름"), "FC 서울");
+    const durationField = screen.getByLabelText("쿼터 기본 시간 (분)");
+    // 999 같은 범위 밖 숫자는 네이티브 min/max 검증이 submit을 막으므로,
+    // 네이티브가 못 거르는 빈 값(Number("") === 0 < 1)으로 JS 검증 경로를 태운다
+    await user.clear(durationField);
+    await user.click(screen.getByRole("button", { name: "추가" }));
+
+    // 에러는 duration 필드에 표시되고, 이름 필드는 정상 상태 유지
+    expect(
+      screen.getByText("쿼터 기본 시간은 1~120분 사이여야 합니다."),
+    ).toBeInTheDocument();
+    expect(durationField).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByLabelText("팀 이름")).not.toHaveAttribute("aria-invalid");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it("creates the team and closes on a valid submit", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
@@ -40,7 +62,8 @@ describe("TeamFormModal", () => {
     await user.click(screen.getByRole("button", { name: "추가" }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(body).toEqual({ user: 1, name: "FC 서울" });
+    // 쿼터 기본 시간은 기본값 45로 함께 전송된다
+    expect(body).toEqual({ user: 1, name: "FC 서울", duration: 45 });
   });
 
   it("trims surrounding whitespace from the name", async () => {

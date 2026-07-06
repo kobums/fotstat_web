@@ -49,9 +49,9 @@ export const teamApi = {
       .then(items),
   read: (id: number, signal?: AbortSignal) =>
     api.get<ItemResponse<Team>>(`/team/${id}`, undefined, signal).then((r) => r.item),
-  create: (userId: number, name: string) =>
-    api.post<CodeResponse>("/team", { user: userId, name }),
-  update: (team: Pick<Team, "id" | "user" | "name">) =>
+  create: (userId: number, name: string, duration?: number) =>
+    api.post<CodeResponse>("/team", { user: userId, name, ...(duration ? { duration } : {}) }),
+  update: (team: Pick<Team, "id" | "user" | "name" | "duration">) =>
     api.put<CodeResponse>("/team", team),
   remove: (id: number) => api.del<CodeResponse>("/team", { id }),
 };

@@ -17,6 +17,7 @@ import { injuredPlayerIdsOn } from "../../lib/injury";
 import { usePlayers } from "../player/usePlayers";
 import InjuryFormModal from "../team/InjuryFormModal";
 import { useInjuries } from "../team/useInjuries";
+import { useTeam } from "../team/useTeams";
 import { useDeleteMatch, useMatch } from "./useMatches";
 import { useQuarters } from "./useQuarters";
 import MatchFormModal from "./MatchFormModal";
@@ -31,6 +32,7 @@ export default function MatchDetailPage() {
 
   const navigate = useNavigate();
   const match = useMatch(mId);
+  const team = useTeam(tId);
   const players = usePlayers(tId);
   const quarters = useQuarters(mId);
   const injuries = useInjuries(tId);
@@ -182,6 +184,12 @@ export default function MatchDetailPage() {
           matchId={mId}
           nextNumber={
             quarterList.reduce((max, q) => Math.max(max, q.number), 0) + 1
+          }
+          // 이전 쿼터 시간 > 팀 기본 시간 > 45분
+          defaultDuration={
+            quarterList[quarterList.length - 1]?.duration ??
+            team.data?.duration ??
+            45
           }
           onClose={() => setQuarterFormOpen(false)}
         />
