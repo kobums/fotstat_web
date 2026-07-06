@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { quarterApi, recordApi } from "../../core/api/endpoints";
-import type { Quarter } from "../../core/api/types";
+import type { Match, Quarter } from "../../core/api/types";
 import { resultOf, type Result } from "../../components/ResultPill/ResultPill";
 import { qk } from "../../lib/queryKeys";
 import { combineLists } from "../../lib/combineQueries";
@@ -14,12 +14,21 @@ export interface MatchResult {
   played: boolean;
 }
 
-// Per-match home/away goals + W/D/L. Shares query keys with the stats and
-// match-detail screens, so the underlying quarter/record fetches are cached.
+// Per-match home/away goals + W/D/L for the whole team. Fans out one
+// quarters fetch per match — prefer useMatchResultsFor with just the
+// rendered matches on list screens.
 export function useMatchResults(teamId: number) {
   const matches = useMatches(teamId);
-  const matchList = matches.data ?? [];
+  const inner = useMatchResultsFor(matches.data ?? []);
+  return {
+    isLoading: matches.isLoading || inner.isLoading,
+    results: inner.results,
+  };
+}
 
+// Same aggregation, scoped to an explicit match list. Shares query keys with
+// the stats and match-detail screens, so quarter/record fetches are cached.
+export function useMatchResultsFor(matchList: Match[]) {
   // `combine` keeps `.data` referentially stable across renders (see
   // combineLists), so the results useMemo below memoizes correctly.
   const quarters = useQueries({
@@ -43,7 +52,7 @@ export function useMatchResults(teamId: number) {
     combine: combineLists,
   });
 
-  const isLoading = matches.isLoading || quarters.isLoading || records.isLoading;
+  const isLoading = quarters.isLoading || records.isLoading;
 
   const results = useMemo(() => {
     const quarterToMatch = new Map<number, number>();
