@@ -14,12 +14,16 @@ function day(date: string | undefined): string {
   return (date ?? "").slice(0, 10);
 }
 
-/** Whether a match on `matchdate` falls inside this injury spell. */
+/**
+ * Whether a match on `matchdate` falls inside this injury spell.
+ * 발생일 당일 경기는 포함하지 않는다(경기 중 부상 = 그날까지는 뛴 것) —
+ * 차단·결장 범위는 발생일 다음 날부터 복귀일 당일까지. 백엔드 injuryConflict와 동일 규칙.
+ */
 export function injuryCoversMatch(injury: Injury, matchdate: string): boolean {
   const start = day(injury.startdate);
   if (!start) return false;
   const d = day(matchdate);
-  if (!d || d < start) return false;
+  if (!d || d <= start) return false;
   const end = day(injury.returndate); // "" while still injured
   return end === "" || d <= end;
 }

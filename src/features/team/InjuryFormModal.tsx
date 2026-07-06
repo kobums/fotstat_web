@@ -20,6 +20,8 @@ interface Props {
   /** 현재 부상 중인 선수 id — 실수 중복 등록을 줄이기 위해 표시하고 기본 선택에서 제외 */
   injuredPlayerIds: Set<number>;
   injury?: Injury | null;
+  /** 신규 등록 시 발생일 프리필 (YYYY-MM-DD, 예: 경기 화면에서 경기일). 미래 날짜는 오늘로 clamp */
+  defaultStartdate?: string;
   onClose: () => void;
 }
 
@@ -28,6 +30,7 @@ export default function InjuryFormModal({
   players,
   injuredPlayerIds,
   injury,
+  defaultStartdate,
   onClose,
 }: Props) {
   const editing = !!injury;
@@ -38,9 +41,10 @@ export default function InjuryFormModal({
       0,
   );
   const [type, setType] = useState(injury?.type ?? "");
-  const [startdate, setStartdate] = useState(
-    (injury?.startdate ?? "").slice(0, 10) || today(),
-  );
+  const [startdate, setStartdate] = useState(() => {
+    const preset = (injury?.startdate ?? "").slice(0, 10) || defaultStartdate || today();
+    return preset > today() ? today() : preset;
+  });
   const [hasReturned, setHasReturned] = useState(
     !!(injury?.returndate ?? "").trim(),
   );
