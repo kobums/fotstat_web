@@ -9,6 +9,7 @@ import {
 import { dayKey, monthStartKey } from "../../lib/date";
 import { useTeamContext } from "../team/teamContext";
 import { useTeamStats, type PlayerStat } from "./useTeamStats";
+import { squadAverages } from "./aggregateTeamStats";
 import RankingList from "./RankingList";
 import PlayerStatDetail from "./PlayerStatDetail";
 import PlayerCompare from "./PlayerCompare";
@@ -49,15 +50,7 @@ export default function TeamStatsPage() {
     !!prevRange && !prevStats.isLoading && prevStats.matchCount > 0;
 
   // Squad average (mean of each player's per-game contribution).
-  const squadAvg = useMemo(() => {
-    const withGames = stats.players.filter((p) => p.games > 0);
-    if (withGames.length === 0) return { goalPerGame: 0, assistPerGame: 0 };
-    const g =
-      withGames.reduce((s, p) => s + p.goal / p.games, 0) / withGames.length;
-    const a =
-      withGames.reduce((s, p) => s + p.assist / p.games, 0) / withGames.length;
-    return { goalPerGame: g, assistPerGame: a };
-  }, [stats.players]);
+  const squadAvg = useMemo(() => squadAverages(stats.players), [stats.players]);
 
   const mc = stats.matchCount;
   const goalDiff = stats.totalGoal - stats.totalConceded;

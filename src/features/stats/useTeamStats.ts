@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { quarterApi, recordApi } from "../../core/api/endpoints";
-import type { Quarter } from "../../core/api/types";
+import type { Match, MatchRecord, Quarter } from "../../core/api/types";
 import { qk } from "../../lib/queryKeys";
 import { combineLists } from "../../lib/combineQueries";
 import { parseMatchDate } from "../../lib/date";
@@ -31,6 +31,10 @@ export interface TeamStatsResult {
   draws: number;
   losses: number;
   players: PlayerStat[];
+  /** 집계에 쓰인 원본 — 리포트 화면의 경기별 쿼터 결과 등 추가 가공용. */
+  matches: Match[];
+  quarters: Quarter[];
+  records: MatchRecord[];
 }
 
 // Client-side aggregation: the backend exposes no stats endpoint, so we walk
@@ -115,5 +119,12 @@ export function useTeamStats(
     [allQuarters, records.data, players.data, injuries.data, matchList],
   );
 
-  return { isLoading, isError, ...aggregate };
+  return {
+    isLoading,
+    isError,
+    ...aggregate,
+    matches: matchList,
+    quarters: allQuarters,
+    records: records.data,
+  };
 }

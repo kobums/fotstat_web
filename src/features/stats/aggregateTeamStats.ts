@@ -14,6 +14,22 @@ export interface PlayerStat {
   absentGames: number;
 }
 
+export interface SquadAverages {
+  goalPerGame: number;
+  assistPerGame: number;
+}
+
+/** 스쿼드 평균 — 출전 기록이 있는 선수들의 경기당 기여 평균 (PlayerStatDetail 기준선). */
+export function squadAverages(players: PlayerStat[]): SquadAverages {
+  const withGames = players.filter((p) => p.games > 0);
+  if (withGames.length === 0) return { goalPerGame: 0, assistPerGame: 0 };
+  const g =
+    withGames.reduce((s, p) => s + p.goal / p.games, 0) / withGames.length;
+  const a =
+    withGames.reduce((s, p) => s + p.assist / p.games, 0) / withGames.length;
+  return { goalPerGame: g, assistPerGame: a };
+}
+
 export interface TeamStatsAggregate {
   matchCount: number;
   totalGoal: number;
