@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+Makefile
+npm-debug.log
+.eslintcache
+.DS_Store
+*.md
+.env
+.env*.local
+e2e
+playwright.config.ts
+playwright-report
+test-results
