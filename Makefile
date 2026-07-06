@@ -1,5 +1,7 @@
 tag=latest
 
+.PHONY: all run build test lint docker dockerrun push clean
+
 all: run
 
 run:

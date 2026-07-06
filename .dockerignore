@@ -5,12 +5,12 @@ dist
 Dockerfile
 docker-compose.yml
 Makefile
-README.md
 npm-debug.log
 .eslintcache
 .DS_Store
 *.md
 .env
+.env*.local
 e2e
 playwright.config.ts
 playwright-report
