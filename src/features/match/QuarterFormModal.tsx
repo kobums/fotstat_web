@@ -9,15 +9,18 @@ import styles from "./QuarterFormModal.module.css";
 interface Props {
   matchId: number;
   nextNumber: number;
+  /** 프리필 기본 시간(분): 이전 쿼터 > 팀 설정값 > 45 (호출부에서 결정) */
+  defaultDuration?: number;
   onClose: () => void;
 }
 
 export default function QuarterFormModal({
   matchId,
   nextNumber,
+  defaultDuration,
   onClose,
 }: Props) {
-  const [duration, setDuration] = useState("25");
+  const [duration, setDuration] = useState(String(defaultDuration ?? 45));
   const [error, setError] = useState<string | null>(null);
   const create = useCreateQuarter(matchId);
 

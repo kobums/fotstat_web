@@ -40,7 +40,8 @@ describe("TeamFormModal", () => {
     await user.click(screen.getByRole("button", { name: "추가" }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(body).toEqual({ user: 1, name: "FC 서울" });
+    // 쿼터 기본 시간은 기본값 45로 함께 전송된다
+    expect(body).toEqual({ user: 1, name: "FC 서울", duration: 45 });
   });
 
   it("trims surrounding whitespace from the name", async () => {

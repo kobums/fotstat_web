@@ -31,7 +31,8 @@ export function useCreateTeam() {
   const { user } = useAuth();
   const userId = user?.id ?? 0;
   return useMutation({
-    mutationFn: (name: string) => teamApi.create(userId, name),
+    mutationFn: (vars: { name: string; duration?: number }) =>
+      teamApi.create(userId, vars.name, vars.duration),
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.teams(userId) }),
   });
 }
@@ -41,8 +42,8 @@ export function useUpdateTeam() {
   const { user } = useAuth();
   const userId = user?.id ?? 0;
   return useMutation({
-    mutationFn: (vars: { id: number; name: string }) =>
-      teamApi.update({ id: vars.id, user: userId, name: vars.name }),
+    mutationFn: (vars: { id: number; name: string; duration?: number }) =>
+      teamApi.update({ id: vars.id, user: userId, name: vars.name, duration: vars.duration }),
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: qk.teams(userId) });
       qc.invalidateQueries({ queryKey: qk.team(vars.id) });

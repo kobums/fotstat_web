@@ -13,6 +13,8 @@ export interface Team {
   id: number;
   user: number;
   name: string;
+  /** 쿼터 기본 시간(분) — 쿼터 추가 시 프리필. 구서버 응답엔 없음 */
+  duration?: number;
   createddate?: string;
   updateddate?: string;
 }
