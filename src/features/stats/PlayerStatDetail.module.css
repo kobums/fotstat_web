@@ -35,9 +35,16 @@
   margin-bottom: var(--sp-2);
 }
 
-.cmpRow {
+/* 모든 행이 같은 컬럼 트랙을 공유하도록 부모 grid + subgrid로 정렬 */
+.cmpRows {
   display: grid;
   grid-template-columns: 1fr auto auto auto auto;
+}
+
+.cmpRow {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   align-items: baseline;
   gap: var(--sp-2);
   padding: 6px 0;

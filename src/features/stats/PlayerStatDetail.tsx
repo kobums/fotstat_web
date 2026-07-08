@@ -91,18 +91,20 @@ export default function PlayerStatDetail({
 
       <div className={styles.cmpCard}>
         <span className={styles.cmpTitle}>팀 평균 대비</span>
-        <CompareRow
-          label="경기당 골"
-          value={goalPg}
-          avg={squadAvg.goalPerGame}
-          pct={goalPct}
-        />
-        <CompareRow
-          label="경기당 도움"
-          value={assistPg}
-          avg={squadAvg.assistPerGame}
-          pct={assistPct}
-        />
+        <div className={styles.cmpRows}>
+          <CompareRow
+            label="경기당 골"
+            value={goalPg}
+            avg={squadAvg.goalPerGame}
+            pct={goalPct}
+          />
+          <CompareRow
+            label="경기당 도움"
+            value={assistPg}
+            avg={squadAvg.assistPerGame}
+            pct={assistPct}
+          />
+        </div>
       </div>
     </Modal>
   );
