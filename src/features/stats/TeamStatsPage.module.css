@@ -10,10 +10,11 @@
   gap: var(--sp-2);
 }
 
-/* 팀 요약: 3열 × 2줄 고정 (경기·전적·득실차 / 득점·실점·도움) */
+/* 팀 요약: 3열 × 2줄 고정 (경기·전적·득실차 / 득점·실점·도움).
+   minmax(0,1fr): 긴 값(예: 전적 10-10-10)이 좁은 화면에서 그리드를 넘치지 않게 */
 .tiles3 {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sp-2);
 }
 
@@ -34,14 +35,14 @@
   gap: var(--sp-4);
 }
 
+/* 본문 폭 제한은 2단 그리드(≥1180px)의 트랙 캡(640px)이 담당한다.
+   여기서 max-width를 걸면 1024~1180px 구간에서 아래 .rankings(풀폭 3열)와
+   폭이 어긋나는 데드 스페이스가 생기므로 두지 않는다. */
 .main {
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
   min-width: 0;
-  /* 넓은 화면에서 타일·선수 비교가 과하게 늘어나지 않게 본문 폭 제한.
-     2단 그리드(≥1180px)에서는 트랙 자체가 640px로 캡되므로 여기선 좁은 화면용. */
-  max-width: 640px;
 }
 
 .rankings {
