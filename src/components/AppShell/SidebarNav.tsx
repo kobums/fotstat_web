@@ -7,6 +7,8 @@ import {
   Home,
   LogOut,
   Moon,
+  PanelLeft,
+  PanelLeftClose,
   Settings,
   Sun,
   Users,
@@ -30,8 +32,18 @@ const TEAM_TABS = [
   { to: "report", label: "리포트", end: false, Icon: FileText },
 ];
 
-/** Navigation content shared by the desktop sidebar and the mobile drawer. */
-export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+/** Navigation content shared by the desktop sidebar and the mobile drawer.
+ *  collapsed(데스크톱 접힘)면 아이콘만 남긴 미니 레일로, onToggle이 있으면
+ *  브랜드 옆(펼침) 또는 상단(접힘)에 접기/펼치기 토글을 노출한다. */
+export default function SidebarNav({
+  onNavigate,
+  collapsed = false,
+  onToggle,
+}: {
+  onNavigate?: () => void;
+  collapsed?: boolean;
+  onToggle?: () => void;
+}) {
   const { data: teams } = useTeams();
   const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
@@ -45,26 +57,53 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
     isActive ? `${styles.subLink} ${styles.subActive}` : styles.subLink;
 
   return (
-    <div className={styles.nav}>
-      <button
-        className={styles.brand}
-        onClick={() => {
-          navigate("/myteam");
-          onNavigate?.();
-        }}
-      >
-        fotstat
-      </button>
+    <div className={collapsed ? `${styles.nav} ${styles.navCollapsed}` : styles.nav}>
+      <div className={styles.brandRow}>
+        {!collapsed && (
+          <button
+            className={styles.brand}
+            onClick={() => {
+              navigate("/myteam");
+              onNavigate?.();
+            }}
+          >
+            fotstat
+          </button>
+        )}
+        {onToggle && (
+          <button
+            className={styles.collapseBtn}
+            onClick={onToggle}
+            aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
+            aria-expanded={!collapsed}
+            aria-controls="app-sidebar"
+            title={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
+          >
+            {collapsed ? (
+              <PanelLeft size={20} />
+            ) : (
+              <PanelLeftClose size={18} />
+            )}
+          </button>
+        )}
+      </div>
 
       <nav className={styles.section}>
-        <NavLink to="/myteam" end className={linkClass} onClick={onNavigate}>
-          <Home size={ICON_SIZE} className={styles.linkIcon} /> 내 팀
+        <NavLink
+          to="/myteam"
+          end
+          className={linkClass}
+          onClick={onNavigate}
+          title={collapsed ? "내 팀" : undefined}
+        >
+          <Home size={ICON_SIZE} className={styles.linkIcon} />
+          {!collapsed && "내 팀"}
         </NavLink>
       </nav>
 
       {teams && teams.length > 0 && (
         <nav className={styles.section}>
-          <span className={styles.sectionLabel}>팀</span>
+          {!collapsed && <span className={styles.sectionLabel}>팀</span>}
           {teams.map((t) => {
             const isActive = activeTeamId === String(t.id);
             return (
@@ -73,11 +112,12 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
                   to={`/teams/${t.id}`}
                   className={linkClass}
                   onClick={onNavigate}
+                  title={collapsed ? t.name : undefined}
                 >
                   <Crest name={t.name} size={24} />
-                  <span className={styles.teamName}>{t.name}</span>
+                  {!collapsed && <span className={styles.teamName}>{t.name}</span>}
                 </NavLink>
-                {isActive && (
+                {isActive && !collapsed && (
                   <div className={styles.subNav}>
                     {TEAM_TABS.map((tab) => (
                       <NavLink
@@ -102,16 +142,26 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
       <div className={styles.spacer} />
 
       <nav className={styles.section}>
-        <NavLink to="/settings" className={linkClass} onClick={onNavigate}>
-          <Settings size={ICON_SIZE} className={styles.linkIcon} /> 설정
+        <NavLink
+          to="/settings"
+          className={linkClass}
+          onClick={onNavigate}
+          title={collapsed ? "설정" : undefined}
+        >
+          <Settings size={ICON_SIZE} className={styles.linkIcon} />
+          {!collapsed && "설정"}
         </NavLink>
-        <button className={styles.link} onClick={toggle}>
+        <button
+          className={styles.link}
+          onClick={toggle}
+          title={collapsed ? (theme === "dark" ? "다크 모드" : "라이트 모드") : undefined}
+        >
           {theme === "dark" ? (
             <Moon size={ICON_SIZE} className={styles.linkIcon} />
           ) : (
             <Sun size={ICON_SIZE} className={styles.linkIcon} />
           )}
-          {theme === "dark" ? "다크 모드" : "라이트 모드"}
+          {!collapsed && (theme === "dark" ? "다크 모드" : "라이트 모드")}
         </button>
         <button
           className={styles.link}
@@ -119,19 +169,23 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
             logout();
             onNavigate?.();
           }}
+          title={collapsed ? "로그아웃" : undefined}
         >
-          <LogOut size={ICON_SIZE} className={styles.linkIcon} /> 로그아웃
+          <LogOut size={ICON_SIZE} className={styles.linkIcon} />
+          {!collapsed && "로그아웃"}
         </button>
       </nav>
 
       <div className={styles.account}>
         <span className={styles.avatar}>{initials(user?.name ?? "U")}</span>
-        <div className={styles.accountText}>
-          <span className={styles.accountName}>{user?.name ?? "사용자"}</span>
-          <span className={styles.accountMail}>
-            {user?.email?.startsWith("guest:") ? "게스트" : user?.email}
-          </span>
-        </div>
+        {!collapsed && (
+          <div className={styles.accountText}>
+            <span className={styles.accountName}>{user?.name ?? "사용자"}</span>
+            <span className={styles.accountMail}>
+              {user?.email?.startsWith("guest:") ? "게스트" : user?.email}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
