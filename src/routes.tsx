@@ -38,8 +38,8 @@ export const routes: RouteObject[] = [
               { path: "squad", element: <SquadPage /> },
               { path: "injuries", element: <InjuriesPage /> },
               { path: "matches", element: <MatchListPage /> },
-              { path: "stats", element: <TeamStatsPage /> },
               // handle.wide: TeamDetailLayout이 이 탭에서는 컨텐츠 max-width를 해제
+              { path: "stats", element: <TeamStatsPage />, handle: { wide: true } },
               { path: "report", element: <SeasonReportPage />, handle: { wide: true } },
             ],
           },

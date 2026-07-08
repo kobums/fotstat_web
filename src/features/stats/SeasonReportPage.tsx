@@ -9,7 +9,7 @@ import {
   ErrorView,
   LoadingView,
 } from "../../components/StateView/StateView";
-import { dayKey, formatMatchDate, monthStartKey } from "../../lib/date";
+import { formatMatchDate } from "../../lib/date";
 import { useTeamContext } from "../team/teamContext";
 import { useTeamStats, type PlayerStat } from "./useTeamStats";
 import { squadAverages } from "./aggregateTeamStats";
@@ -33,13 +33,9 @@ function recordSheetTitle(start?: string, end?: string): string {
 }
 
 export default function SeasonReportPage() {
-  const { team } = useTeamContext();
+  // 기간은 통계 탭과 공유 (TeamDetailLayout 소유) — 한 탭에서 바꾸면 함께 바뀐다
+  const { team, statsRange: range, setStatsRange: setRange } = useTeamContext();
   const navigate = useNavigate();
-  // 통계 탭과 동일하게 이번 달(1일 → 오늘) 기본, "초기화"로 전체 기간
-  const [range, setRange] = useState(() => {
-    const now = new Date();
-    return { start: monthStartKey(now), end: dayKey(now) };
-  });
   const [selected, setSelected] = useState<PlayerStat | null>(null);
   const filtered = !!range.start || !!range.end;
 

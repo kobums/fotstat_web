@@ -10,6 +10,14 @@
   gap: var(--sp-2);
 }
 
+/* 팀 요약: 3열 × 2줄 고정 (경기·전적·득실차 / 득점·실점·도움).
+   minmax(0,1fr): 긴 값(예: 전적 10-10-10)이 좁은 화면에서 그리드를 넘치지 않게 */
+.tiles3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
 .heading {
   font-size: 13px;
   font-weight: 700;
@@ -17,6 +25,24 @@
   text-transform: uppercase;
   color: var(--text-sec);
   margin-bottom: var(--sp-2);
+}
+
+/* 기본은 세로 스택(순위는 본문 아래). 1180px 이상에서 본문 | 순위 2단
+   (리포트 탭과 동일한 패턴 — SeasonReportPage.module.css 참고). */
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* 본문 폭 제한은 2단 그리드(≥1180px)의 트랙 캡(640px)이 담당한다.
+   여기서 max-width를 걸면 1024~1180px 구간에서 아래 .rankings(풀폭 3열)와
+   폭이 어긋나는 데드 스페이스가 생기므로 두지 않는다. */
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
 }
 
 .rankings {
@@ -27,7 +53,36 @@
 
 @media (min-width: 720px) {
   .rankings {
-    grid-template-columns: repeat(3, 1fr);
+    /* minmax(0,1fr): 1fr의 최소값(콘텐츠 폭) 때문에 그리드가 넘치지 않게 */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: start;
+  }
+}
+
+/* 충분히 넓으면 [본문] [득점 | 도움 | 출전] — 순위 3종이 오른쪽 컬럼에 가로로.
+   두 트랙 모두 minmax(0, 640px): 본문 트랙이 1fr로 늘어나 중간에 빈 공간이
+   생기지 않고, 좁은 화면(iPad)에서는 두 컬럼이 비례해서 줄어든다.
+   전체 보기로 길어지면 순위 컬럼이 sticky + 자체 스크롤로 감당한다. */
+@media (min-width: 1180px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 640px) minmax(0, 640px);
+    align-items: start;
+  }
+
+  .rankings {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    position: sticky;
+    top: var(--sp-4);
+    max-height: calc(100dvh - var(--sp-4) * 2);
+    overflow-y: auto;
+  }
+}
+
+/* 아주 넓은 화면: 순위 컬럼이 남는 폭을 전부 흡수해(≥640px 보장 지점부터)
+   세 목록이 균등하게 넓어진다 — 오른쪽에 자투리 공백이 남지 않는다. */
+@media (min-width: 1600px) {
+  .layout {
+    grid-template-columns: 640px minmax(0, 1fr);
   }
 }
