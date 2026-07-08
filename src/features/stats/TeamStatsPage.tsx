@@ -6,7 +6,7 @@ import {
   ErrorView,
   LoadingView,
 } from "../../components/StateView/StateView";
-import { dayKey, monthStartKey } from "../../lib/date";
+import { dayKey } from "../../lib/date";
 import { useTeamContext } from "../team/teamContext";
 import { useTeamStats, type PlayerStat } from "./useTeamStats";
 import { squadAverages } from "./aggregateTeamStats";
@@ -21,12 +21,8 @@ const fmt1 = (n: number) => n.toFixed(1);
 const signed = (n: number) => (n > 0 ? `+${n}` : String(n));
 
 export default function TeamStatsPage() {
-  const { team } = useTeamContext();
-  // Default to this month (1st → today), like the app. "초기화" clears to all-time.
-  const [range, setRange] = useState(() => {
-    const now = new Date();
-    return { start: monthStartKey(now), end: dayKey(now) };
-  });
+  // 기간은 리포트 탭과 공유 (TeamDetailLayout 소유) — 한 탭에서 바꾸면 함께 바뀐다
+  const { team, statsRange: range, setStatsRange: setRange } = useTeamContext();
   const [selected, setSelected] = useState<PlayerStat | null>(null);
   const filtered = !!range.start || !!range.end;
 
@@ -71,18 +67,20 @@ export default function TeamStatsPage() {
           }
         />
       ) : (
-        <>
-          <div className={styles.tiles}>
+        <div className={styles.layout}>
+          <div className={styles.main}>
+          {/* 3열 × 2줄 고정: 경기·전적·득실차 / 득점·실점·도움 */}
+          <div className={styles.tiles3}>
             <StatTile label="경기" value={mc} />
             <StatTile
               label="전적"
               value={`${stats.wins}-${stats.draws}-${stats.losses}`}
               sub="승-무-패"
             />
+            <StatTile label="득실차" value={signed(goalDiff)} />
             <StatTile label="득점" value={stats.totalGoal} />
             <StatTile label="실점" value={stats.totalConceded} />
             <StatTile label="도움" value={stats.totalAssist} />
-            <StatTile label="득실차" value={signed(goalDiff)} />
           </div>
 
           <section>
@@ -120,13 +118,15 @@ export default function TeamStatsPage() {
           )}
 
           <PlayerCompare players={stats.players} />
+          </div>
 
-          <div className={styles.rankings}>
+          <aside className={styles.rankings} aria-label="순위">
             <RankingList
               title="득점 순위"
               metric="goal"
               players={stats.players}
               sub={(p) => `+${p.assist}A`}
+              defaultExpanded
               onSelect={setSelected}
             />
             <RankingList
@@ -134,6 +134,7 @@ export default function TeamStatsPage() {
               metric="assist"
               players={stats.players}
               sub={(p) => `${p.goal}G`}
+              defaultExpanded
               onSelect={setSelected}
             />
             <RankingList
@@ -142,10 +143,11 @@ export default function TeamStatsPage() {
               unit="′"
               players={stats.players}
               sub={(p) => `${p.games}경기 · ${p.goal}G ${p.assist}A`}
+              defaultExpanded
               onSelect={setSelected}
             />
-          </div>
-        </>
+          </aside>
+        </div>
       )}
 
       {selected && (
