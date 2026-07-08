@@ -55,7 +55,7 @@ export default function RankingList({
             <button className={styles.row} onClick={() => onSelect(p)}>
               {/* 기록이 없는 선수는 순위가 아니라 동률 0이므로 번호 대신 - */}
               <span className={styles.rank}>{p[metric] > 0 ? i + 1 : "-"}</span>
-              <PlayerAvatar number={p.number} position={p.position} size={30} />
+              <PlayerAvatar number={p.number} position={p.position} size={24} />
               <span className={styles.info}>
                 <span className={styles.name}>{p.name}</span>
                 <span className={styles.barTrack} aria-hidden>
