@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { aggregateTeamStats } from "./aggregateTeamStats";
+import {
+  aggregateTeamStats,
+  matchMinutes,
+  playerMatchIds,
+} from "./aggregateTeamStats";
 import type { MatchRecord, Player, Quarter } from "../../core/api/types";
 
 function quarter(p: Partial<Quarter> & Pick<Quarter, "id" | "match">): Quarter {
@@ -94,5 +98,59 @@ describe("aggregateTeamStats", () => {
     expect(r.players[0].games).toBe(0);
     // The one real quarter (match 1) has home 0 vs away 0 -> draw.
     expect(r.draws).toBe(1);
+  });
+});
+
+// 경기기록표(matchRecordSheet)의 '총 경기수'·'총 경기시간'이 공유하는 헬퍼.
+describe("playerMatchIds / matchMinutes", () => {
+  const quarters: Quarter[] = [
+    quarter({ id: 11, match: 100, duration: 45 }),
+    quarter({ id: 12, match: 100, duration: 45 }),
+    quarter({ id: 21, match: 200, duration: 30 }),
+  ];
+  const records: MatchRecord[] = [
+    // p1: 경기 100의 두 쿼터 모두 출전 → 경기 1개로 집계
+    record({ id: 1, quarter: 11, player: 1 }),
+    record({ id: 2, quarter: 12, player: 1 }),
+    // p2: 경기 100·200 모두 출전
+    record({ id: 3, quarter: 11, player: 2 }),
+    record({ id: 4, quarter: 21, player: 2 }),
+    // 알 수 없는 쿼터의 기록은 어느 경기에도 귀속되지 않는다
+    record({ id: 5, quarter: 999, player: 3 }),
+  ];
+
+  it("collects distinct match ids per player", () => {
+    const m = playerMatchIds(quarters, records);
+    expect([...(m.get(1) ?? [])]).toEqual([100]);
+    expect([...(m.get(2) ?? [])].sort()).toEqual([100, 200]);
+    expect(m.get(3)).toBeUndefined(); // unknown quarter -> no credit
+  });
+
+  it("sums quarter durations per match", () => {
+    const mm = matchMinutes(quarters);
+    expect(mm.get(100)).toBe(90);
+    expect(mm.get(200)).toBe(30);
+  });
+
+  it("combines into per-player total match minutes (경기기록표 '총 경기시간')", () => {
+    const ids = playerMatchIds(quarters, records);
+    const mm = matchMinutes(quarters);
+    const total = (pid: number) =>
+      [...(ids.get(pid) ?? [])].reduce((s, m) => s + (mm.get(m) ?? 0), 0);
+    expect(total(1)).toBe(90); // 경기 100만
+    expect(total(2)).toBe(120); // 90 + 30
+    expect(total(3)).toBe(0);
+  });
+
+  it("stays consistent with aggregateTeamStats games count", () => {
+    const r = aggregateTeamStats(quarters, records, [
+      player({ id: 1, name: "A" }),
+      player({ id: 2, name: "B" }),
+      player({ id: 3, name: "C" }),
+    ]);
+    const ids = playerMatchIds(quarters, records);
+    r.players.forEach((p) => {
+      expect(p.games).toBe(ids.get(p.id)?.size ?? 0);
+    });
   });
 });

@@ -30,6 +30,33 @@ export function squadAverages(players: PlayerStat[]): SquadAverages {
   return { goalPerGame: g, assistPerGame: a };
 }
 
+/** 선수별로 기록을 남긴 경기 id 집합. "경기 참여"의 단일 정의 —
+ *  aggregateTeamStats(경기수)와 matchRecordSheet(총 경기시간)가 공유한다. */
+export function playerMatchIds(
+  allQuarters: Quarter[],
+  records: MatchRecord[],
+): Map<number, Set<number>> {
+  const quarterToMatch = new Map(allQuarters.map((q) => [q.id, q.match]));
+  const byPlayer = new Map<number, Set<number>>();
+  records.forEach((r) => {
+    const matchId = quarterToMatch.get(r.quarter);
+    if (matchId === undefined) return;
+    const set = byPlayer.get(r.player) ?? new Set<number>();
+    set.add(matchId);
+    byPlayer.set(r.player, set);
+  });
+  return byPlayer;
+}
+
+/** 경기별 총 시간(쿼터 duration 합). */
+export function matchMinutes(allQuarters: Quarter[]): Map<number, number> {
+  const byMatch = new Map<number, number>();
+  allQuarters.forEach((q) => {
+    byMatch.set(q.match, (byMatch.get(q.match) ?? 0) + q.duration);
+  });
+  return byMatch;
+}
+
 export interface TeamStatsAggregate {
   matchCount: number;
   totalGoal: number;
@@ -61,10 +88,8 @@ export function aggregateTeamStats(
     awayByMatch.set(q.match, (awayByMatch.get(q.match) ?? 0) + q.awaygoals);
   });
 
-  const perPlayer = new Map<
-    number,
-    { min: number; goal: number; assist: number; matches: Set<number> }
-  >();
+  const perPlayer = new Map<number, { min: number; goal: number; assist: number }>();
+  const matchesByPlayer = playerMatchIds(allQuarters, records);
   let totalGoal = 0;
   let totalAssist = 0;
 
@@ -75,16 +100,10 @@ export function aggregateTeamStats(
     if (matchId !== undefined) {
       homeByMatch.set(matchId, (homeByMatch.get(matchId) ?? 0) + r.goal);
     }
-    const acc = perPlayer.get(r.player) ?? {
-      min: 0,
-      goal: 0,
-      assist: 0,
-      matches: new Set<number>(),
-    };
+    const acc = perPlayer.get(r.player) ?? { min: 0, goal: 0, assist: 0 };
     acc.min += r.min;
     acc.goal += r.goal;
     acc.assist += r.assist;
-    if (matchId !== undefined) acc.matches.add(matchId);
     perPlayer.set(r.player, acc);
   });
 
@@ -110,7 +129,7 @@ export function aggregateTeamStats(
       name: p.name,
       number: p.number,
       position: p.position,
-      games: acc?.matches.size ?? 0,
+      games: matchesByPlayer.get(p.id)?.size ?? 0,
       min: acc?.min ?? 0,
       goal: acc?.goal ?? 0,
       assist: acc?.assist ?? 0,
