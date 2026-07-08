@@ -24,8 +24,15 @@
     overflow-y: auto;
     z-index: 30;
   }
+  /* 접힘: 아이콘만 남긴 좁은 레일. 본문도 레일 폭만 비운다. */
+  .sidebar.collapsed {
+    width: var(--rail-w);
+  }
   .main {
     padding-left: var(--sidebar-w);
+  }
+  .main.mainCollapsed {
+    padding-left: var(--rail-w);
   }
 }
 

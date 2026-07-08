@@ -51,6 +51,7 @@
   /* Layout */
   --content-max: 1080px;
   --sidebar-w: 264px;
+  --rail-w: 72px;
   --header-h: 56px;
   --tabbar-h: 64px;
 
