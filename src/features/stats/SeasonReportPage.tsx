@@ -16,7 +16,21 @@ import { squadAverages } from "./aggregateTeamStats";
 import { buildMatchReports } from "./buildMatchReports";
 import RankingList from "./RankingList";
 import PlayerStatDetail from "./PlayerStatDetail";
+import MatchRecordDownload from "./MatchRecordDownload";
 import styles from "./SeasonReportPage.module.css";
+
+/** 원본 양식("6월 경기기록표")처럼 기간이 한 달 안이면 "M월 경기기록표"로. */
+function recordSheetTitle(start?: string, end?: string): string {
+  if (start && end && start.slice(0, 7) === end.slice(0, 7)) {
+    return `${Number(start.slice(5, 7))}월 경기기록표`;
+  }
+  if (start || end) {
+    const s = (start || "처음").replaceAll("-", ".");
+    const e = (end || "오늘").replaceAll("-", ".");
+    return `${s}~${e} 경기기록표`;
+  }
+  return "전체 경기기록표";
+}
 
 export default function SeasonReportPage() {
   const { team } = useTeamContext();
@@ -43,7 +57,16 @@ export default function SeasonReportPage() {
 
   return (
     <div className={styles.wrap}>
-      <DateRangeFilter start={range.start} end={range.end} onChange={setRange} />
+      <div className={styles.toolbar}>
+        <DateRangeFilter start={range.start} end={range.end} onChange={setRange} />
+        <MatchRecordDownload
+          players={stats.players}
+          quarters={stats.quarters}
+          records={stats.records}
+          teamName={team.name}
+          title={recordSheetTitle(range.start, range.end)}
+        />
+      </div>
 
       {stats.isLoading ? (
         <LoadingView label="리포트 집계 중…" />

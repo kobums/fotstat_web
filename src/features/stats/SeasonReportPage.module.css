@@ -4,6 +4,15 @@
   gap: var(--sp-4);
 }
 
+/* 기간 필터(좌) + 과제기록표 다운로드(우). 좁으면 줄바꿈. */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
 /* 기본은 세로 스택(순위는 본문 아래). 1180px 이상(iPad Pro/Air 가로 포함)에서
    본문 | 순위 2단이 된다(파일 하단 미디어쿼리). 그 미만은 사이드바(264px)를
    제외한 본문 폭이 부족해 순위를 본문 아래에 나란히 둔다. */
