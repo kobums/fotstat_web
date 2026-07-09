@@ -3,9 +3,9 @@ import Button from "../../components/Button/Button";
 import Modal from "../../components/Modal/Modal";
 import Stepper from "../../components/Stepper/Stepper";
 import Select from "../../components/Select/Select";
-import { ApiError } from "../../core/api/client";
 import type { MatchRecord, Player } from "../../core/api/types";
 import { assistCap, clampAssist, rebalanceAssists } from "../../lib/assistCap";
+import { errorMessage } from "../../lib/notifyError";
 import { sumAssists, sumGoals } from "../../lib/records";
 import { useCreateRecord, useUpdateRecord } from "./useRecords";
 import styles from "./RecordFormModal.module.css";
@@ -136,7 +136,7 @@ export default function RecordFormModal({
       }
       onClose();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "저장에 실패했습니다.");
+      setError(errorMessage(err, "저장에 실패했습니다."));
     }
   }
 

@@ -3,7 +3,7 @@ import Button from "../../components/Button/Button";
 import Modal from "../../components/Modal/Modal";
 import TextField from "../../components/TextField/TextField";
 import { useAuth } from "../../core/auth/AuthContext";
-import { ApiError } from "../../core/api/client";
+import { errorMessage } from "../../lib/notifyError";
 import styles from "./UpgradeModal.module.css";
 
 export default function UpgradeModal({ onClose }: { onClose: () => void }) {
@@ -22,7 +22,7 @@ export default function UpgradeModal({ onClose }: { onClose: () => void }) {
       await upgrade(email.trim(), password, name.trim());
       onClose();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "전환에 실패했습니다.");
+      setError(errorMessage(err, "전환에 실패했습니다."));
     } finally {
       setBusy(false);
     }

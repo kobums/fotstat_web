@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Button from "../../components/Button/Button";
 import { useAuth } from "../../core/auth/AuthContext";
-import { ApiError } from "../../core/api/client";
+import { errorMessage } from "../../lib/notifyError";
 import styles from "./LandingPage.module.css";
 
 const FEATURES = [
@@ -57,7 +57,7 @@ export default function LandingPage() {
       await loginGuest();
       navigate("/myteam");
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : "시작하지 못했습니다.");
+      alert(errorMessage(err, "시작하지 못했습니다."));
     } finally {
       setGuestBusy(false);
     }

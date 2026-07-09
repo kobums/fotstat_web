@@ -5,7 +5,7 @@ import AppHeader from "../../components/AppHeader/AppHeader";
 import Button from "../../components/Button/Button";
 import { useAuth } from "../../core/auth/AuthContext";
 import { useTheme } from "../../core/theme/ThemeContext";
-import { ApiError } from "../../core/api/client";
+import { errorMessage } from "../../lib/notifyError";
 import UpgradeModal from "./UpgradeModal";
 import styles from "./SettingsPage.module.css";
 
@@ -29,7 +29,7 @@ export default function SettingsPage() {
       await deleteAccount();
       navigate("/login", { replace: true });
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : "삭제에 실패했습니다.");
+      alert(errorMessage(err, "삭제에 실패했습니다."));
     } finally {
       setBusy(false);
     }

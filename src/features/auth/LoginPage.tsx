@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import TextField from "../../components/TextField/TextField";
 import { useAuth } from "../../core/auth/AuthContext";
-import { ApiError } from "../../core/api/client";
+import { errorMessage } from "../../lib/notifyError";
 import styles from "./auth.module.css";
 
 export default function LoginPage() {
@@ -21,7 +21,7 @@ export default function LoginPage() {
       await action();
       navigate("/myteam", { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "로그인에 실패했습니다.");
+      setError(errorMessage(err, "로그인에 실패했습니다."));
     } finally {
       setPending(null);
     }
