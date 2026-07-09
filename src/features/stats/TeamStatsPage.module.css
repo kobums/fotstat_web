@@ -60,13 +60,13 @@
 }
 
 /* 충분히 넓으면 [본문] [득점 | 도움 | 출전] — 순위 3종이 오른쪽 컬럼에 가로로.
-   두 트랙 모두 minmax(0, 640px): 본문 트랙이 1fr로 늘어나 중간에 빈 공간이
-   생기지 않고, 좁은 화면(iPad)에서는 두 컬럼이 비례해서 줄어든다.
+   본문(왼쪽)은 좁게 캡을 두고, 순위(오른쪽)가 남는 폭을 전부 흡수(1fr)해
+   iPad 폭에서도 세 목록의 선수 이름이 잘리지 않게 한다.
    전체 보기로 길어지면 순위 컬럼이 sticky + 자체 스크롤로 감당한다. */
 @media (min-width: 1180px) {
   .layout {
     display: grid;
-    grid-template-columns: minmax(0, 640px) minmax(0, 640px);
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
     align-items: start;
   }
 
@@ -79,10 +79,9 @@
   }
 }
 
-/* 아주 넓은 화면: 순위 컬럼이 남는 폭을 전부 흡수해(≥640px 보장 지점부터)
-   세 목록이 균등하게 넓어진다 — 오른쪽에 자투리 공백이 남지 않는다. */
+/* 아주 넓은 화면: 본문을 조금 넓혀 균형을 맞추되 순위는 계속 남는 폭을 흡수한다. */
 @media (min-width: 1600px) {
   .layout {
-    grid-template-columns: 640px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
   }
 }

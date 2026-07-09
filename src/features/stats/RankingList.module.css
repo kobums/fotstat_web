@@ -25,8 +25,8 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  padding: 3px var(--sp-2);
+  gap: 6px;
+  padding: 3px 6px;
   background: none;
   border: none;
   color: var(--text);
@@ -39,11 +39,12 @@
 }
 
 .rank {
-  width: 18px;
+  width: 16px;
   text-align: center;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--text-sec);
+  flex-shrink: 0;
 }
 
 .info {
@@ -54,7 +55,23 @@
   gap: 2px;
 }
 
+/* 윗줄: 이름(가변) + 값(오른쪽). 이름이 가로폭을 최대한 차지 */
+.topLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+
+/* 아랫줄: 비례 막대(가변) + 부가정보(오른쪽) */
+.botLine {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
 .name {
+  flex: 1;
+  min-width: 0;
   font-size: 13px;
   line-height: 1.2;
   font-weight: 600;
@@ -66,6 +83,8 @@
 /* 1위 기록 대비 비례 바 (iOS StatRankRow 미러) */
 .barTrack {
   display: block;
+  flex: 1;
+  min-width: 0;
   height: 3px;
   border-radius: 2px;
   background: var(--bg-elev3);
@@ -90,17 +109,14 @@
   flex-shrink: 0;
 }
 
-/* 값 오른쪽 부가 정보 (iOS StatRankRow.subLabel 미러).
-   좁은 화면에서 이름 컬럼을 짓누르지 않도록 최대폭에서 말줄임 처리. */
+/* 막대 오른쪽 부가 정보(경기·골·어시 등). 이 값이 잘리지 않도록 항상 전체 표시하고,
+   공간이 부족하면 왼쪽 비례 막대(.barTrack)가 먼저 줄어든다(flex-shrink). */
 .sub {
   font-size: 11px;
   color: var(--text-ter);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
-  max-width: 40%;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .more {

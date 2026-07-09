@@ -142,7 +142,7 @@ export default function TeamStatsPage() {
               metric="min"
               unit="′"
               players={stats.players}
-              sub={(p) => `${p.games}경기 · ${p.goal}G ${p.assist}A`}
+              sub={(p) => `${p.games}경기 ${p.goal}G ${p.assist}A`}
               defaultExpanded
               onSelect={setSelected}
             />
