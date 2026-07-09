@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Crest from "../../components/Crest/Crest";
 import DateRangeFilter from "../../components/DateRangeFilter/DateRangeFilter";
-import ResultPill, { resultOf } from "../../components/ResultPill/ResultPill";
+import ResultPill from "../../components/ResultPill/ResultPill";
+import { resultOf } from "../../lib/matchResult";
 import StatTile from "../../components/StatTile/StatTile";
 import {
   EmptyView,

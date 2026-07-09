@@ -6,6 +6,7 @@ import Select from "../../components/Select/Select";
 import { ApiError } from "../../core/api/client";
 import type { MatchRecord, Player } from "../../core/api/types";
 import { assistCap, clampAssist, rebalanceAssists } from "../../lib/assistCap";
+import { sumAssists, sumGoals } from "../../lib/records";
 import { useCreateRecord, useUpdateRecord } from "./useRecords";
 import styles from "./RecordFormModal.module.css";
 
@@ -55,8 +56,8 @@ export default function RecordFormModal({
   // ① 자기 골에는 어시스트 불가 ② 쿼터의 어시스트 합 ≤ 골 합.
   // "남"은 현재 선택된 선수를 제외한 이 쿼터의 기존 기록.
   const others = records.filter((r) => r.player !== playerId);
-  const othersGoals = others.reduce((s, r) => s + r.goal, 0);
-  const othersAssists = others.reduce((s, r) => s + r.assist, 0);
+  const othersGoals = sumGoals(others);
+  const othersAssists = sumAssists(others);
   const cap = assistCap({ othersGoals, othersAssists, ownGoals: goal });
 
   // 골이 바뀌면 캡도 바뀌므로 어시스트를 즉시 캡 안으로 되돌린다.
@@ -73,8 +74,8 @@ export default function RecordFormModal({
     const rest = records.filter((r) => r.player !== id);
     setAssist((a) =>
       clampAssist(a, {
-        othersGoals: rest.reduce((s, r) => s + r.goal, 0),
-        othersAssists: rest.reduce((s, r) => s + r.assist, 0),
+        othersGoals: sumGoals(rest),
+        othersAssists: sumAssists(rest),
         ownGoals: goal,
       }),
     );

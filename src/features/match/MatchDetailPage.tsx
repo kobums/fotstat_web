@@ -4,7 +4,9 @@ import { useQueries } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
 import AppHeader from "../../components/AppHeader/AppHeader";
 import Button from "../../components/Button/Button";
-import ResultPill, { resultOf } from "../../components/ResultPill/ResultPill";
+import ResultPill from "../../components/ResultPill/ResultPill";
+import { resultOf } from "../../lib/matchResult";
+import { sumGoals } from "../../lib/records";
 import {
   ErrorView,
   LoadingView,
@@ -83,10 +85,7 @@ export default function MatchDetailPage() {
   }, [quarterList, recordQueries]);
 
   const homeTotal = useMemo(
-    () =>
-      Array.from(recordsByQuarter.values())
-        .flat()
-        .reduce((s, r) => s + r.goal, 0),
+    () => sumGoals(Array.from(recordsByQuarter.values()).flat()),
     [recordsByQuarter],
   );
   const awayTotal = useMemo(

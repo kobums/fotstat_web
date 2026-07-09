@@ -1,5 +1,6 @@
 import type { Injury, Match, MatchRecord, Player, Quarter } from "../../core/api/types";
 import { absentGamesFor } from "../../lib/injury";
+import { perMatchGoals, resultOf } from "../../lib/matchResult";
 
 export interface PlayerStat {
   id: number;
@@ -78,15 +79,10 @@ export function aggregateTeamStats(
   injuries: Injury[] = [],
   matches: Match[] = [],
 ): TeamStatsAggregate {
-  const quarterToMatch = new Map<number, number>();
-  allQuarters.forEach((q) => quarterToMatch.set(q.id, q.match));
-
-  // Per-match home/away goals for W/D/L.
-  const homeByMatch = new Map<number, number>();
-  const awayByMatch = new Map<number, number>();
-  allQuarters.forEach((q) => {
-    awayByMatch.set(q.match, (awayByMatch.get(q.match) ?? 0) + q.awaygoals);
-  });
+  // Per-match home/away goals + W/D/L (shared "records.goal = home,
+  // awaygoals = away" rule). A match counts as played once it has a quarter,
+  // so the map keys are exactly the played matches.
+  const goalsByMatch = perMatchGoals(allQuarters, records);
 
   const perPlayer = new Map<number, { min: number; goal: number; assist: number }>();
   const matchesByPlayer = playerMatchIds(allQuarters, records);
@@ -94,12 +90,8 @@ export function aggregateTeamStats(
   let totalAssist = 0;
 
   records.forEach((r) => {
-    const matchId = quarterToMatch.get(r.quarter);
     totalGoal += r.goal;
     totalAssist += r.assist;
-    if (matchId !== undefined) {
-      homeByMatch.set(matchId, (homeByMatch.get(matchId) ?? 0) + r.goal);
-    }
     const acc = perPlayer.get(r.player) ?? { min: 0, goal: 0, assist: 0 };
     acc.min += r.min;
     acc.goal += r.goal;
@@ -107,19 +99,22 @@ export function aggregateTeamStats(
     perPlayer.set(r.player, acc);
   });
 
-  // A match counts as played once it has at least one quarter.
-  const playedMatchIds = new Set(allQuarters.map((q) => q.match));
   let wins = 0;
   let draws = 0;
   let losses = 0;
   let totalConceded = 0;
-  playedMatchIds.forEach((mId) => {
-    const home = homeByMatch.get(mId) ?? 0;
-    const away = awayByMatch.get(mId) ?? 0;
+  goalsByMatch.forEach(({ home, away }) => {
     totalConceded += away;
-    if (home > away) wins++;
-    else if (home < away) losses++;
-    else draws++;
+    switch (resultOf(home, away)) {
+      case "W":
+        wins++;
+        break;
+      case "L":
+        losses++;
+        break;
+      default:
+        draws++;
+    }
   });
 
   const playerStats: PlayerStat[] = players.map((p) => {
@@ -141,7 +136,7 @@ export function aggregateTeamStats(
   );
 
   return {
-    matchCount: playedMatchIds.size,
+    matchCount: goalsByMatch.size,
     totalGoal,
     totalConceded,
     totalAssist,
