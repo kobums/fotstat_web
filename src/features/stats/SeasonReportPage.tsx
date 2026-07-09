@@ -180,6 +180,10 @@ export default function SeasonReportPage() {
           stat={selected}
           squadAvg={squadAvg}
           allPlayers={stats.players}
+          matches={stats.matches}
+          quarters={stats.quarters}
+          records={stats.records}
+          injuries={stats.injuries}
           onClose={() => setSelected(null)}
         />
       )}
