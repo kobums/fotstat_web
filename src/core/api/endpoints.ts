@@ -173,3 +173,19 @@ export const injuryApi = {
     api.put<CodeResponse>("/injury", injury),
   remove: (id: number) => api.del<CodeResponse>("/injury", { id }),
 };
+
+// ---- Report ----
+
+export const reportApi = {
+  /**
+   * 경기기록표 xlsx 를 백엔드에서 생성해 Blob 으로 받는다.
+   * 집계·서식은 서버가 담당하므로 웹·iOS 가 동일한 파일을 얻는다.
+   * start/end 는 "YYYY-MM-DD"(inclusive), 비우면 전체 기간.
+   */
+  matchRecord: (teamId: number, start?: string, end?: string) =>
+    api.getBlob("/report/matchrecord", {
+      team: teamId,
+      start: start || undefined,
+      end: end || undefined,
+    }),
+};

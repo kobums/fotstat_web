@@ -56,11 +56,12 @@ export default function SeasonReportPage() {
       <div className={styles.toolbar}>
         <DateRangeFilter start={range.start} end={range.end} onChange={setRange} />
         <MatchRecordDownload
-          players={stats.players}
-          quarters={stats.quarters}
-          records={stats.records}
+          teamId={team.id}
           teamName={team.name}
+          start={range.start}
+          end={range.end}
           title={recordSheetTitle(range.start, range.end)}
+          disabled={stats.players.length === 0}
         />
       </div>
 
