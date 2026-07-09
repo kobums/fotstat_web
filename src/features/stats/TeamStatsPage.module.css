@@ -35,8 +35,8 @@
   gap: var(--sp-4);
 }
 
-/* 본문 폭 제한은 2단 그리드(≥1180px)의 트랙 캡(640px)이 담당한다.
-   여기서 max-width를 걸면 1024~1180px 구간에서 아래 .rankings(풀폭 3열)와
+/* 본문 폭 제한은 2단 그리드(≥1280px)의 트랙 캡(380px)이 담당한다.
+   여기서 max-width를 걸면 그 미만 구간에서 아래 .rankings(풀폭 3열)와
    폭이 어긋나는 데드 스페이스가 생기므로 두지 않는다. */
 .main {
   display: flex;
@@ -59,14 +59,15 @@
   }
 }
 
-/* 충분히 넓으면 [본문] [득점 | 도움 | 출전] — 순위 3종이 오른쪽 컬럼에 가로로.
-   두 트랙 모두 minmax(0, 640px): 본문 트랙이 1fr로 늘어나 중간에 빈 공간이
-   생기지 않고, 좁은 화면(iPad)에서는 두 컬럼이 비례해서 줄어든다.
+/* 충분히 넓으면(≥1280px) [본문] [득점 | 도움 | 출전] — 순위 3종이 오른쪽 컬럼에 가로로.
+   본문(왼쪽)은 좁게 캡을 두고, 순위(오른쪽)가 남는 폭을 전부 흡수(1fr)해
+   세 목록의 선수 이름·부가정보가 잘리지 않게 한다. 1280px 미만에서는 순위가
+   본문 아래 풀폭 3열로 배치되어 폭 여유가 충분하다.
    전체 보기로 길어지면 순위 컬럼이 sticky + 자체 스크롤로 감당한다. */
-@media (min-width: 1180px) {
+@media (min-width: 1280px) {
   .layout {
     display: grid;
-    grid-template-columns: minmax(0, 640px) minmax(0, 640px);
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
     align-items: start;
   }
 
@@ -79,10 +80,9 @@
   }
 }
 
-/* 아주 넓은 화면: 순위 컬럼이 남는 폭을 전부 흡수해(≥640px 보장 지점부터)
-   세 목록이 균등하게 넓어진다 — 오른쪽에 자투리 공백이 남지 않는다. */
+/* 아주 넓은 화면: 본문을 조금 넓혀 균형을 맞추되 순위는 계속 남는 폭을 흡수한다. */
 @media (min-width: 1600px) {
   .layout {
-    grid-template-columns: 640px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
   }
 }

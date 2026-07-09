@@ -55,25 +55,31 @@ export default function RankingList({
             <button className={styles.row} onClick={() => onSelect(p)}>
               {/* 기록이 없는 선수는 순위가 아니라 동률 0이므로 번호 대신 - */}
               <span className={styles.rank}>{p[metric] > 0 ? i + 1 : "-"}</span>
-              <PlayerAvatar number={p.number} position={p.position} size={24} />
+              <PlayerAvatar number={p.number} position={p.position} size={22} />
+              {/* 좁은 순위 컬럼에서도 이름이 보이도록 이름·값을 윗줄, 막대·부가정보를
+                  아랫줄로 나눈다 — 가로로 나열하지 않아 이름 폭이 확보된다. */}
               <span className={styles.info}>
-                <span className={styles.name}>{p.name}</span>
-                <span className={styles.barTrack} aria-hidden>
-                  <span
-                    className={
-                      i === 0 && p[metric] > 0
-                        ? styles.barFillTop
-                        : styles.barFill
-                    }
-                    style={{ width: `${(p[metric] / maxVal) * 100}%` }}
-                  />
+                <span className={styles.topLine}>
+                  <span className={styles.name}>{p.name}</span>
+                  <span className={styles.value}>
+                    {p[metric]}
+                    {unit}
+                  </span>
+                </span>
+                <span className={styles.botLine}>
+                  <span className={styles.barTrack} aria-hidden>
+                    <span
+                      className={
+                        i === 0 && p[metric] > 0
+                          ? styles.barFillTop
+                          : styles.barFill
+                      }
+                      style={{ width: `${(p[metric] / maxVal) * 100}%` }}
+                    />
+                  </span>
+                  {sub && <span className={styles.sub}>{sub(p)}</span>}
                 </span>
               </span>
-              <span className={styles.value}>
-                {p[metric]}
-                {unit}
-              </span>
-              {sub && <span className={styles.sub}>{sub(p)}</span>}
             </button>
           </li>
         ))}
