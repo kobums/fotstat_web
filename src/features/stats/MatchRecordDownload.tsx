@@ -1,35 +1,34 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
 import Button from "../../components/Button/Button";
-import type { MatchRecord, Quarter } from "../../core/api/types";
-import type { PlayerStat } from "./useTeamStats";
-import { buildMatchRecordSheet, downloadBlob } from "./matchRecordSheet";
+import { reportApi } from "../../core/api/endpoints";
+import { downloadBlob } from "../../lib/download";
 
-/** 리포트 탭에서 현재 집계를 원본 양식 그대로의 경기기록표 xlsx로 내려받는 버튼. */
+/**
+ * 리포트 탭에서 경기기록표 xlsx를 내려받는 버튼.
+ * 집계·엑셀 서식은 백엔드가 생성하며(웹·iOS 공용), 여기서는 Blob을 받아 저장만 한다.
+ */
 export default function MatchRecordDownload({
-  players,
-  quarters,
-  records,
+  teamId,
   teamName,
+  start,
+  end,
   title,
+  disabled = false,
 }: {
-  players: PlayerStat[];
-  quarters: Quarter[];
-  records: MatchRecord[];
+  teamId: number;
   teamName: string;
+  start?: string;
+  end?: string;
   title: string;
+  disabled?: boolean;
 }) {
   const [busy, setBusy] = useState(false);
-  const disabled = players.length === 0;
 
   const onClick = async () => {
     setBusy(true);
     try {
-      // 원본 양식과 같은 로스터 순(등번호) 정렬.
-      const roster = players
-        .slice()
-        .sort((a, b) => a.number - b.number || a.name.localeCompare(b.name));
-      const blob = await buildMatchRecordSheet(roster, quarters, records, title);
+      const blob = await reportApi.matchRecord(teamId, start, end);
       downloadBlob(blob, `${teamName} ${title}.xlsx`);
     } catch (e) {
       alert(e instanceof Error ? e.message : "다운로드에 실패했습니다.");

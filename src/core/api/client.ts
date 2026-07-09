@@ -205,9 +205,65 @@ function extractMessage(json: unknown): string | undefined {
   return undefined;
 }
 
+// Binary GET for file downloads (e.g. xlsx report). Shares the auth header and
+// 401 refresh-and-retry with request(), but returns the raw Blob instead of
+// parsing JSON. Error responses still carry a JSON envelope, so we surface its
+// message as an ApiError.
+async function requestBlob(
+  path: string,
+  query?: RequestOptions["query"],
+  retry = true,
+): Promise<Blob> {
+  const headers: Record<string, string> = {};
+  const token = getToken();
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  let res: Response;
+  try {
+    res = await fetch(buildUrl(path, query), { method: "GET", headers });
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") throw err;
+    throw new ApiError("네트워크 연결을 확인해주세요.", 0);
+  }
+
+  if (res.status === 401) {
+    if (retry) {
+      const outcome = await refreshAccessToken();
+      if (outcome === "refreshed") return requestBlob(path, query, false);
+      if (outcome === "transient") {
+        throw new ApiError(
+          "인증 갱신에 일시적으로 실패했습니다. 잠시 후 다시 시도해주세요.",
+          401,
+        );
+      }
+    }
+    setToken(null);
+    setRefreshToken(null);
+    window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+    throw new ApiError("인증이 만료되었습니다.", 401);
+  }
+
+  if (!res.ok) {
+    let json: unknown;
+    try {
+      json = await res.json();
+    } catch {
+      json = null;
+    }
+    throw new ApiError(
+      extractMessage(json) ?? `요청 실패 (${res.status})`,
+      res.status,
+    );
+  }
+
+  return res.blob();
+}
+
 export const api = {
   get: <T>(path: string, query?: RequestOptions["query"], signal?: AbortSignal) =>
     request<T>("GET", path, { query, signal }),
+  getBlob: (path: string, query?: RequestOptions["query"]) =>
+    requestBlob(path, query),
   post: <T>(path: string, body?: unknown) =>
     request<T>("POST", path, { body }),
   put: <T>(path: string, body?: unknown) => request<T>("PUT", path, { body }),
