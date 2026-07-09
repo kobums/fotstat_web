@@ -5,16 +5,11 @@
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  composes: field from "../../styles/shared.module.css";
 }
 
 .label {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  color: var(--text-sec);
+  composes: label from "../../styles/shared.module.css";
 }
 
 .check {
@@ -44,6 +39,5 @@
 }
 
 .error {
-  font-size: 13px;
-  color: var(--neg);
+  composes: error from "../../styles/shared.module.css";
 }

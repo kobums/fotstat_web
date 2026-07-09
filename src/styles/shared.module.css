@@ -1,0 +1,41 @@
+/* Rules shared verbatim across feature CSS modules. Reference from a module
+   with `composes: <name> from "../../styles/shared.module.css"` so the class
+   name stays local while the declarations live in one place. Only put rules
+   here that are truly identical across features — feature-specific variants
+   (e.g. a wrapping toolbar, an uppercase label) stay in their own module. */
+
+/* 리스트 페이지 상단 툴바 (좌: 개수, 우: 추가 버튼) */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-3);
+}
+
+/* 툴바의 개수 표기 / 폼 필드 라벨 — 동일한 소형 강조 텍스트 */
+.count {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-sec);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-sec);
+}
+
+/* 폼 필드 래퍼 (라벨 + 컨트롤 세로 배치) */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 폼 검증/저장 에러 메시지 */
+.error {
+  font-size: 13px;
+  color: var(--neg);
+}
