@@ -1,24 +1,14 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
 import { recordApi } from "../../core/api/endpoints";
 import { qk } from "../../lib/queryKeys";
-import { notifyError } from "../../lib/notifyError";
+import { useEntityQuery, useInvalidatingMutation } from "../../lib/queryFactory";
 
 export function useRecords(quarterId: number) {
-  return useQuery({
-    queryKey: qk.records(quarterId),
-    queryFn: ({ signal }) => recordApi.list(quarterId, signal),
-    enabled: quarterId > 0,
-  });
+  return useEntityQuery(qk.records(quarterId), recordApi.list, quarterId);
 }
 
 export function useCreateRecord(quarterId: number) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (input: {
+  return useInvalidatingMutation(
+    (input: {
       player: number;
       min: number;
       goal: number;
@@ -26,14 +16,13 @@ export function useCreateRecord(quarterId: number) {
       yellowcard: number;
       redcard: number;
     }) => recordApi.create({ quarter: quarterId, ...input }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.records(quarterId) }),
-  });
+    { invalidate: () => [qk.records(quarterId)] },
+  );
 }
 
 export function useUpdateRecord(quarterId: number) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (input: {
+  return useInvalidatingMutation(
+    (input: {
       id: number;
       min: number;
       goal: number;
@@ -41,15 +30,13 @@ export function useUpdateRecord(quarterId: number) {
       yellowcard: number;
       redcard: number;
     }) => recordApi.updateStats(input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.records(quarterId) }),
-  });
+    { invalidate: () => [qk.records(quarterId)] },
+  );
 }
 
 export function useDeleteRecord(quarterId: number) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: number) => recordApi.remove(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.records(quarterId) }),
-    onError: notifyError("기록을 삭제하지 못했습니다."),
+  return useInvalidatingMutation((id: number) => recordApi.remove(id), {
+    invalidate: () => [qk.records(quarterId)],
+    errorMessage: "기록을 삭제하지 못했습니다.",
   });
 }

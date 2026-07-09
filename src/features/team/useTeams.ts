@@ -1,63 +1,43 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
 import { teamApi } from "../../core/api/endpoints";
 import { useAuth } from "../../core/auth/AuthContext";
 import { qk } from "../../lib/queryKeys";
-import { notifyError } from "../../lib/notifyError";
+import { useEntityQuery, useInvalidatingMutation } from "../../lib/queryFactory";
 
 export function useTeams() {
   const { user } = useAuth();
   const userId = user?.id ?? 0;
-  return useQuery({
-    queryKey: qk.teams(userId),
-    queryFn: ({ signal }) => teamApi.list(userId, signal),
-    enabled: userId > 0,
-  });
+  return useEntityQuery(qk.teams(userId), teamApi.list, userId);
 }
 
 export function useTeam(id: number) {
-  return useQuery({
-    queryKey: qk.team(id),
-    queryFn: ({ signal }) => teamApi.read(id, signal),
-    enabled: id > 0,
-  });
+  return useEntityQuery(qk.team(id), teamApi.read, id);
 }
 
 export function useCreateTeam() {
-  const qc = useQueryClient();
   const { user } = useAuth();
   const userId = user?.id ?? 0;
-  return useMutation({
-    mutationFn: (vars: { name: string; duration?: number }) =>
+  return useInvalidatingMutation(
+    (vars: { name: string; duration?: number }) =>
       teamApi.create(userId, vars.name, vars.duration),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.teams(userId) }),
-  });
+    { invalidate: () => [qk.teams(userId)] },
+  );
 }
 
 export function useUpdateTeam() {
-  const qc = useQueryClient();
   const { user } = useAuth();
   const userId = user?.id ?? 0;
-  return useMutation({
-    mutationFn: (vars: { id: number; name: string; duration?: number }) =>
+  return useInvalidatingMutation(
+    (vars: { id: number; name: string; duration?: number }) =>
       teamApi.update({ id: vars.id, user: userId, name: vars.name, duration: vars.duration }),
-    onSuccess: (_d, vars) => {
-      qc.invalidateQueries({ queryKey: qk.teams(userId) });
-      qc.invalidateQueries({ queryKey: qk.team(vars.id) });
-    },
-  });
+    { invalidate: (vars) => [qk.teams(userId), qk.team(vars.id)] },
+  );
 }
 
 export function useDeleteTeam() {
-  const qc = useQueryClient();
   const { user } = useAuth();
   const userId = user?.id ?? 0;
-  return useMutation({
-    mutationFn: (id: number) => teamApi.remove(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.teams(userId) }),
-    onError: notifyError("팀을 삭제하지 못했습니다."),
+  return useInvalidatingMutation((id: number) => teamApi.remove(id), {
+    invalidate: () => [qk.teams(userId)],
+    errorMessage: "팀을 삭제하지 못했습니다.",
   });
 }
