@@ -7,9 +7,17 @@ interface ModalProps {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  /** 넓은 화면에서 2단 레이아웃 등 넓은 콘텐츠용으로 시트 폭을 키운다. */
+  wide?: boolean;
 }
 
-export default function Modal({ open, title, onClose, children }: ModalProps) {
+export default function Modal({
+  open,
+  title,
+  onClose,
+  children,
+  wide = false,
+}: ModalProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -32,7 +40,7 @@ export default function Modal({ open, title, onClose, children }: ModalProps) {
       role="presentation"
     >
       <div
-        className={styles.sheet}
+        className={`${styles.sheet} ${wide ? styles.wide : ""}`}
         role="dialog"
         aria-modal="true"
         aria-label={title}

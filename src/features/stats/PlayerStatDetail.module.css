@@ -1,3 +1,43 @@
+/* 2단 레이아웃: 좁은 화면은 세로 스택, 넓은 화면(≥760px)은 좌(정보)|우(경기별 기록) */
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-4);
+}
+
+@media (min-width: 760px) {
+  .split {
+    grid-template-columns: minmax(0, 300px) 1fr;
+    align-items: start;
+  }
+  /* 좁아진 왼쪽 컬럼(300px)에서는 요약 타일을 2열로 — 라벨 줄바꿈 방지 */
+  .left .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.left,
+.right {
+  min-width: 0;
+}
+
+/* 넓은 화면 좌우 배치에서 각 컬럼 첫 요소의 상단 여백 제거(상단 정렬) */
+.left > *:first-child,
+.right > *:first-child {
+  margin-top: 0;
+}
+
+.logEmpty {
+  margin-top: var(--sp-2);
+  padding: var(--sp-4);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-ter);
+  background: var(--bg-elev2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
 .head {
   display: flex;
   align-items: center;
@@ -35,24 +75,39 @@
   margin-bottom: var(--sp-2);
 }
 
-/* 모든 행이 같은 컬럼 트랙을 공유하도록 부모 grid + subgrid로 정렬 */
+/* 좁은 컬럼(2단 왼쪽)에서도 안 깨지게 행마다 2줄 블록으로:
+   1줄 = 라벨 · 값 / 2줄 = 팀 평균 · 증감 · 상위% */
 .cmpRows {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
 }
 
 .cmpRow {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+}
+
+.cmpTop {
+  display: flex;
   align-items: baseline;
+  justify-content: space-between;
   gap: var(--sp-2);
-  padding: 6px 0;
+}
+
+.cmpBottom {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
 }
 
 .cmpLabel {
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .cmpValue {
@@ -65,9 +120,10 @@
   font-size: 12px;
   color: var(--text-ter);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-/* 스쿼드 내 상위 X% 배지 (iOS PlayerStatDetailView 미러) */
+/* 스쿼드 내 상위 X% 배지 (iOS PlayerStatDetailView 미러) — 항상 오른쪽 끝 */
 .pct {
   font-size: 11px;
   font-weight: 700;
@@ -77,6 +133,7 @@
   padding: 2px 6px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  margin-left: auto;
 }
 
 .cmpDiff {
@@ -86,8 +143,141 @@
   font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  min-width: 48px;
-  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+/* 경기별 기록 · 부상 이력 카드 */
+.logCard {
+  margin-top: var(--sp-4);
+  background: var(--bg-elev2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-3);
+}
+
+.logList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.logItem {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-elev);
+}
+
+.logHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 6px;
+}
+
+.logDate {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-sec);
+}
+
+.logOpp {
+  font-size: 13px;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logScore {
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.qLines {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 3px var(--sp-2);
+  align-items: baseline;
+}
+
+.qLine {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+}
+
+.qNum {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-sec);
+}
+
+.qMin {
+  font-size: 12px;
+  color: var(--text-ter);
+  font-variant-numeric: tabular-nums;
+}
+
+.qStat {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.qCards {
+  font-size: 11px;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.logTotal {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-sec);
+  font-variant-numeric: tabular-nums;
+}
+
+.injList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.injItem {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 13px;
+}
+
+.injType {
+  font-weight: 700;
+}
+
+.injPeriod {
+  color: var(--text-ter);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.injActive {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--neg);
+  background: color-mix(in srgb, var(--neg) 14%, transparent);
+  border-radius: var(--r-sm);
+  padding: 2px 6px;
+  margin-left: auto;
 }
 
 @media (max-width: 420px) {

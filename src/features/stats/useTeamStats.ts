@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { quarterApi, recordApi } from "../../core/api/endpoints";
-import type { Match, MatchRecord, Quarter } from "../../core/api/types";
+import type { Injury, Match, MatchRecord, Quarter } from "../../core/api/types";
 import { qk } from "../../lib/queryKeys";
 import { combineLists } from "../../lib/combineQueries";
 import { parseMatchDate } from "../../lib/date";
@@ -35,6 +35,7 @@ export interface TeamStatsResult {
   matches: Match[];
   quarters: Quarter[];
   records: MatchRecord[];
+  injuries: Injury[];
 }
 
 // Client-side aggregation: the backend exposes no stats endpoint, so we walk
@@ -126,5 +127,6 @@ export function useTeamStats(
     matches: matchList,
     quarters: allQuarters,
     records: records.data,
+    injuries: injuries.data ?? [],
   };
 }

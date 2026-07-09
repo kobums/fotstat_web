@@ -76,3 +76,10 @@
     border-radius: var(--r-xl);
   }
 }
+
+/* 넓은 모드: 좁은 화면에서는 기본 시트와 동일(100% up to 480), 넓은 화면에서만 확장 */
+@media (min-width: 760px) {
+  .sheet.wide {
+    max-width: 900px;
+  }
+}
