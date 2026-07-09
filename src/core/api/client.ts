@@ -111,15 +111,56 @@ function buildUrl(path: string, query?: RequestOptions["query"]): string {
   return url.toString();
 }
 
+/** Bearer auth header from the stored token (empty object when signed out). */
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+/** fetch that rethrows AbortError untouched and normalizes any other network
+ *  failure (offline, DNS, CORS) to ApiError(status 0). */
+async function doFetch(url: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") throw err;
+    throw new ApiError("네트워크 연결을 확인해주세요.", 0);
+  }
+}
+
+/** Handle a 401: try a single refresh-and-retry (via `retryFn`), else clear the
+ *  session and broadcast a logout. Only call when the response was a 401 — it
+ *  always either returns the retried result or throws. */
+async function handleUnauthorized<T>(
+  retry: boolean,
+  retryFn: () => Promise<T>,
+): Promise<T> {
+  if (retry) {
+    const outcome = await refreshAccessToken();
+    if (outcome === "refreshed") return retryFn();
+    if (outcome === "transient") {
+      // Couldn't reach the refresh endpoint; keep the session and let the
+      // caller retry later instead of bouncing the user to login.
+      throw new ApiError(
+        "인증 갱신에 일시적으로 실패했습니다. 잠시 후 다시 시도해주세요.",
+        401,
+      );
+    }
+    // "invalid" falls through to a full logout.
+  }
+  setToken(null);
+  setRefreshToken(null);
+  window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+  throw new ApiError("인증이 만료되었습니다.", 401);
+}
+
 async function request<T>(
   method: string,
   path: string,
   opts: RequestOptions = {},
   retry = true,
 ): Promise<T> {
-  const headers: Record<string, string> = {};
-  const token = getToken();
-  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const headers: Record<string, string> = authHeaders();
 
   let bodyInit: BodyInit | undefined;
   if (opts.body !== undefined) {
@@ -127,41 +168,15 @@ async function request<T>(
     bodyInit = JSON.stringify(opts.body);
   }
 
-  let res: Response;
-  try {
-    res = await fetch(buildUrl(path, opts.query), {
-      method,
-      headers,
-      body: bodyInit,
-      signal: opts.signal,
-    });
-  } catch (err) {
-    if (err instanceof DOMException && err.name === "AbortError") throw err;
-    // Network failure (offline, DNS, CORS): normalize to ApiError(status 0).
-    throw new ApiError("네트워크 연결을 확인해주세요.", 0);
-  }
+  const res = await doFetch(buildUrl(path, opts.query), {
+    method,
+    headers,
+    body: bodyInit,
+    signal: opts.signal,
+  });
 
   if (res.status === 401) {
-    // Try a single refresh-and-retry before giving up.
-    if (retry) {
-      const outcome = await refreshAccessToken();
-      if (outcome === "refreshed") {
-        return request<T>(method, path, opts, false);
-      }
-      if (outcome === "transient") {
-        // Couldn't reach the refresh endpoint; keep the session and let the
-        // caller retry later instead of bouncing the user to login.
-        throw new ApiError(
-          "인증 갱신에 일시적으로 실패했습니다. 잠시 후 다시 시도해주세요.",
-          401,
-        );
-      }
-      // "invalid" falls through to a full logout.
-    }
-    setToken(null);
-    setRefreshToken(null);
-    window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
-    throw new ApiError("인증이 만료되었습니다.", 401);
+    return handleUnauthorized(retry, () => request<T>(method, path, opts, false));
   }
 
   let json: unknown;
@@ -214,33 +229,13 @@ async function requestBlob(
   query?: RequestOptions["query"],
   retry = true,
 ): Promise<Blob> {
-  const headers: Record<string, string> = {};
-  const token = getToken();
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  let res: Response;
-  try {
-    res = await fetch(buildUrl(path, query), { method: "GET", headers });
-  } catch (err) {
-    if (err instanceof DOMException && err.name === "AbortError") throw err;
-    throw new ApiError("네트워크 연결을 확인해주세요.", 0);
-  }
+  const res = await doFetch(buildUrl(path, query), {
+    method: "GET",
+    headers: authHeaders(),
+  });
 
   if (res.status === 401) {
-    if (retry) {
-      const outcome = await refreshAccessToken();
-      if (outcome === "refreshed") return requestBlob(path, query, false);
-      if (outcome === "transient") {
-        throw new ApiError(
-          "인증 갱신에 일시적으로 실패했습니다. 잠시 후 다시 시도해주세요.",
-          401,
-        );
-      }
-    }
-    setToken(null);
-    setRefreshToken(null);
-    window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
-    throw new ApiError("인증이 만료되었습니다.", 401);
+    return handleUnauthorized(retry, () => requestBlob(path, query, false));
   }
 
   if (!res.ok) {
