@@ -3,8 +3,12 @@ import Button from "../../components/Button/Button";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import { EmptyView, StatusView } from "../../components/StateView/StateView";
 import type { Injury } from "../../core/api/types";
-import { today } from "../../lib/date";
-import { absentGamesForInjury, isActiveInjury } from "../../lib/injury";
+import { dayOf, today } from "../../lib/date";
+import {
+  absentGamesForInjury,
+  activeInjuriesSorted,
+  pastInjuriesSorted,
+} from "../../lib/injury";
 import { notifyError } from "../../lib/notifyError";
 import { useMatches } from "../match/useMatches";
 import { usePlayers } from "../player/usePlayers";
@@ -30,16 +34,8 @@ export default function InjuriesPage() {
     [playerList],
   );
 
-  const byRecent = (a: Injury, b: Injury) =>
-    (b.startdate ?? "").localeCompare(a.startdate ?? "");
-  const active = useMemo(
-    () => (injuries ?? []).filter(isActiveInjury).sort(byRecent),
-    [injuries],
-  );
-  const past = useMemo(
-    () => (injuries ?? []).filter((i) => !isActiveInjury(i)).sort(byRecent),
-    [injuries],
-  );
+  const active = useMemo(() => activeInjuriesSorted(injuries ?? []), [injuries]);
+  const past = useMemo(() => pastInjuriesSorted(injuries ?? []), [injuries]);
 
   // 복귀 처리 — 복귀일을 오늘로 종료. 날짜를 바꾸려면 항목을 눌러 수정하면 된다.
   function endInjury(injury: Injury) {
@@ -48,7 +44,7 @@ export default function InjuriesPage() {
         id: injury.id,
         player: injury.player,
         type: injury.type ?? "",
-        startdate: (injury.startdate ?? "").slice(0, 10),
+        startdate: dayOf(injury.startdate),
         returndate: today(),
         memo: injury.memo ?? "",
       },
@@ -111,7 +107,7 @@ export default function InjuriesPage() {
                     </span>
                     {injury.startdate && (
                       <span className={styles.period}>
-                        {injury.startdate.slice(0, 10)}~
+                        {dayOf(injury.startdate)}~
                       </span>
                     )}
                   </div>
@@ -146,8 +142,7 @@ export default function InjuriesPage() {
                       결장 {absentGamesForInjury(injury, matchList)}경기
                     </span>
                     <span className={styles.period}>
-                      {(injury.startdate ?? "").slice(0, 10)}~
-                      {(injury.returndate ?? "").slice(0, 10)}
+                      {dayOf(injury.startdate)}~{dayOf(injury.returndate)}
                     </span>
                   </div>
                 </button>

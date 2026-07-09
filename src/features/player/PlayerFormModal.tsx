@@ -5,6 +5,7 @@ import TextField from "../../components/TextField/TextField";
 import Select from "../../components/Select/Select";
 import DatePicker from "../../components/DatePicker/DatePicker";
 import type { Player } from "../../core/api/types";
+import { today } from "../../lib/date";
 import { POSITION_OPTIONS } from "../../lib/position";
 import { useEntityForm } from "../shared/useEntityForm";
 import { useCreatePlayer, useUpdatePlayer } from "./usePlayers";
@@ -24,8 +25,10 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
   );
   const [position, setPosition] = useState(player?.position ?? "ST");
   const [birthdate, setBirthdate] = useState(player?.birthdate ?? "");
-  // Births can't be in the future; cap the calendar at today.
-  const today = new Date().toISOString().slice(0, 10);
+  // Births can't be in the future; cap the calendar at today. Use the local
+  // day (today()); toISOString() would be UTC and roll to "yesterday" before
+  // 09:00 KST, blocking today from being selectable.
+  const maxBirthdate = today();
   const create = useCreatePlayer(teamId);
   const update = useUpdatePlayer(teamId);
   const { editing, pending, error, setError, submit } = useEntityForm({
@@ -83,7 +86,7 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
           <DatePicker
             value={birthdate}
             onChange={setBirthdate}
-            max={today}
+            max={maxBirthdate}
             placeholder="생년월일 (선택)"
             aria-label="생년월일"
           />

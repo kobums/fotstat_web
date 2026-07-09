@@ -3,15 +3,26 @@
 // so comparing the leading 10 chars lexicographically orders them correctly.
 
 import type { Injury, Match } from "../core/api/types";
-import { today } from "./date";
+import { dayOf, today } from "./date";
 
 /** returndate empty ("") means the player is still injured. */
 export function isActiveInjury(injury: Injury): boolean {
   return !(injury.returndate ?? "").trim();
 }
 
-function day(date: string | undefined): string {
-  return (date ?? "").slice(0, 10);
+/** 발생일(startdate) 내림차순 비교자 — 최근 부상이 먼저. */
+export function byStartdateDesc(a: Injury, b: Injury): number {
+  return (b.startdate ?? "").localeCompare(a.startdate ?? "");
+}
+
+/** 부상 중인 선수만 골라 최근순 정렬. */
+export function activeInjuriesSorted(injuries: Injury[]): Injury[] {
+  return injuries.filter(isActiveInjury).sort(byStartdateDesc);
+}
+
+/** 복귀 완료 부상만 골라 최근순 정렬. */
+export function pastInjuriesSorted(injuries: Injury[]): Injury[] {
+  return injuries.filter((i) => !isActiveInjury(i)).sort(byStartdateDesc);
 }
 
 /**
@@ -20,11 +31,11 @@ function day(date: string | undefined): string {
  * 차단·결장 범위는 발생일 다음 날부터 복귀일 당일까지. 백엔드 injuryConflict와 동일 규칙.
  */
 export function injuryCoversMatch(injury: Injury, matchdate: string): boolean {
-  const start = day(injury.startdate);
+  const start = dayOf(injury.startdate);
   if (!start) return false;
-  const d = day(matchdate);
+  const d = dayOf(matchdate);
   if (!d || d <= start) return false;
-  const end = day(injury.returndate); // "" while still injured
+  const end = dayOf(injury.returndate); // "" while still injured
   return end === "" || d <= end;
 }
 
@@ -50,7 +61,7 @@ export function absentGamesForInjury(
   until: string = today(),
 ): number {
   return matches.filter(
-    (m) => day(m.matchdate) <= until && injuryCoversMatch(injury, m.matchdate),
+    (m) => dayOf(m.matchdate) <= until && injuryCoversMatch(injury, m.matchdate),
   ).length;
 }
 
@@ -65,7 +76,7 @@ export function absentGamesFor(
   if (spells.length === 0) return 0;
   return matches.filter(
     (m) =>
-      day(m.matchdate) <= until &&
+      dayOf(m.matchdate) <= until &&
       spells.some((i) => injuryCoversMatch(i, m.matchdate)),
   ).length;
 }

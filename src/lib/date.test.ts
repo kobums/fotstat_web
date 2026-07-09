@@ -9,8 +9,21 @@ import {
   isUpcoming,
   toDayKey,
   dayKey,
+  dayOf,
   monthStartKey,
 } from "./date";
+
+describe("dayOf", () => {
+  it("takes the leading 10-char day of a date/datetime string", () => {
+    expect(dayOf("2026-01-02 10:30:00")).toBe("2026-01-02");
+    expect(dayOf("2026-01-02")).toBe("2026-01-02");
+  });
+  it("returns empty string for nullish input", () => {
+    expect(dayOf(null)).toBe("");
+    expect(dayOf(undefined)).toBe("");
+    expect(dayOf("")).toBe("");
+  });
+});
 
 describe("parseMatchDate", () => {
   it("parses the API space-separated format", () => {

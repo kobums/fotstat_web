@@ -14,7 +14,7 @@ import {
 import { recordApi } from "../../core/api/endpoints";
 import type { MatchRecord } from "../../core/api/types";
 import { qk } from "../../lib/queryKeys";
-import { formatMatchDate, today } from "../../lib/date";
+import { dayOf, formatMatchDate, today } from "../../lib/date";
 import { injuredPlayerIdsOn } from "../../lib/injury";
 import { usePlayers } from "../player/usePlayers";
 import InjuryFormModal from "../team/InjuryFormModal";
@@ -209,7 +209,7 @@ export default function MatchDetailPage() {
           injuredPlayerIds={injuredPlayerIds}
           defaultStartdate={
             // 발생일 = 경기일 프리필. 미래(예정) 경기는 오늘로 clamp
-            [match.data.matchdate.slice(0, 10), today()].sort()[0]
+            [dayOf(match.data.matchdate), today()].sort()[0]
           }
           onClose={() => setInjuryFormOpen(false)}
         />

@@ -5,7 +5,7 @@ import Select from "../../components/Select/Select";
 import TextField from "../../components/TextField/TextField";
 import DatePicker from "../../components/DatePicker/DatePicker";
 import type { Injury, Player } from "../../core/api/types";
-import { today } from "../../lib/date";
+import { dayOf, today } from "../../lib/date";
 import { useEntityForm } from "../shared/useEntityForm";
 import {
   useCreateInjury,
@@ -41,15 +41,13 @@ export default function InjuryFormModal({
   );
   const [type, setType] = useState(injury?.type ?? "");
   const [startdate, setStartdate] = useState(() => {
-    const preset = (injury?.startdate ?? "").slice(0, 10) || defaultStartdate || today();
+    const preset = dayOf(injury?.startdate) || defaultStartdate || today();
     return preset > today() ? today() : preset;
   });
   const [hasReturned, setHasReturned] = useState(
     !!(injury?.returndate ?? "").trim(),
   );
-  const [returndate, setReturndate] = useState(
-    (injury?.returndate ?? "").slice(0, 10),
-  );
+  const [returndate, setReturndate] = useState(dayOf(injury?.returndate));
   const [memo, setMemo] = useState(injury?.memo ?? "");
 
   const create = useCreateInjury(teamId);
