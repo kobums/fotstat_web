@@ -4,11 +4,7 @@ import { ChevronRight } from "lucide-react";
 import Button from "../../components/Button/Button";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import PosChip from "../../components/PosChip/PosChip";
-import {
-  EmptyView,
-  ErrorView,
-  LoadingView,
-} from "../../components/StateView/StateView";
+import { EmptyView, StatusView } from "../../components/StateView/StateView";
 import { POSITION_GROUPS, positionGroup } from "../../lib/position";
 import { useTeamContext } from "../team/teamContext";
 import { usePlayers } from "./usePlayers";
@@ -42,16 +38,19 @@ export default function SquadPage() {
         </Button>
       </div>
 
-      {isLoading && <LoadingView />}
-      {isError && (
-        <ErrorView message="선수를 불러오지 못했습니다." onRetry={refetch} />
-      )}
-      {players && players.length === 0 && (
-        <EmptyView
-          title="선수가 없습니다"
-          description="선수를 추가해 스쿼드를 구성하세요."
-        />
-      )}
+      <StatusView
+        isLoading={isLoading}
+        isError={isError}
+        errorMessage="선수를 불러오지 못했습니다."
+        onRetry={refetch}
+        isEmpty={!!players && players.length === 0}
+        empty={
+          <EmptyView
+            title="선수가 없습니다"
+            description="선수를 추가해 스쿼드를 구성하세요."
+          />
+        }
+      />
       {grouped.map((g) => (
         <section key={g.key} className={styles.group}>
           <h3 className={styles.groupTitle}>

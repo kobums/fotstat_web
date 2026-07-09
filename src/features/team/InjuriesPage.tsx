@@ -1,17 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import Button from "../../components/Button/Button";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
-import {
-  EmptyView,
-  ErrorView,
-  LoadingView,
-} from "../../components/StateView/StateView";
+import { EmptyView, StatusView } from "../../components/StateView/StateView";
 import type { Injury } from "../../core/api/types";
 import { today } from "../../lib/date";
 import { absentGamesForInjury, isActiveInjury } from "../../lib/injury";
 import { notifyError } from "../../lib/notifyError";
 import { useMatches } from "../match/useMatches";
 import { usePlayers } from "../player/usePlayers";
+import { useFormModalState } from "../shared/useFormModalState";
 import { useTeamContext } from "./teamContext";
 import { useInjuries, useUpdateInjury } from "./useInjuries";
 import InjuryFormModal from "./InjuryFormModal";
@@ -24,8 +21,7 @@ export default function InjuriesPage() {
   const { data: matches } = useMatches(team.id);
   const { data: injuries, isLoading, isError, refetch } = useInjuries(team.id);
   const update = useUpdateInjury(team.id);
-  const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Injury | null>(null);
+  const form = useFormModalState<Injury>();
 
   const playerList = useMemo(() => players ?? [], [players]);
   const matchList = useMemo(() => matches ?? [], [matches]);
@@ -44,15 +40,6 @@ export default function InjuriesPage() {
     () => (injuries ?? []).filter((i) => !isActiveInjury(i)).sort(byRecent),
     [injuries],
   );
-
-  function openCreate() {
-    setEditing(null);
-    setFormOpen(true);
-  }
-  function openEdit(injury: Injury) {
-    setEditing(injury);
-    setFormOpen(true);
-  }
 
   // 복귀 처리 — 복귀일을 오늘로 종료. 날짜를 바꾸려면 항목을 눌러 수정하면 된다.
   function endInjury(injury: Injury) {
@@ -88,24 +75,24 @@ export default function InjuriesPage() {
         <span className={styles.count}>
           {injuries ? `부상 중 ${active.length}명` : " "}
         </span>
-        <Button size="sm" fullWidth={false} onClick={openCreate}>
+        <Button size="sm" fullWidth={false} onClick={form.openCreate}>
           부상 등록
         </Button>
       </div>
 
-      {isLoading && <LoadingView />}
-      {isError && (
-        <ErrorView
-          message="부상 기록을 불러오지 못했습니다."
-          onRetry={refetch}
-        />
-      )}
-      {injuries && injuries.length === 0 && (
-        <EmptyView
-          title="부상 기록이 없습니다"
-          description="선수가 다치면 등록해 기록 입력에서 자동으로 제외하세요."
-        />
-      )}
+      <StatusView
+        isLoading={isLoading}
+        isError={isError}
+        errorMessage="부상 기록을 불러오지 못했습니다."
+        onRetry={refetch}
+        isEmpty={!!injuries && injuries.length === 0}
+        empty={
+          <EmptyView
+            title="부상 기록이 없습니다"
+            description="선수가 다치면 등록해 기록 입력에서 자동으로 제외하세요."
+          />
+        }
+      />
 
       {active.length > 0 && (
         <section className={styles.group}>
@@ -115,7 +102,7 @@ export default function InjuriesPage() {
               <div key={injury.id} className={styles.row}>
                 <button
                   className={styles.rowMain}
-                  onClick={() => openEdit(injury)}
+                  onClick={() => form.openEdit(injury)}
                 >
                   {playerCell(injury)}
                   <div className={styles.right}>
@@ -151,7 +138,7 @@ export default function InjuriesPage() {
               <div key={injury.id} className={styles.row}>
                 <button
                   className={styles.rowMain}
-                  onClick={() => openEdit(injury)}
+                  onClick={() => form.openEdit(injury)}
                 >
                   {playerCell(injury)}
                   <div className={styles.right}>
@@ -170,13 +157,13 @@ export default function InjuriesPage() {
         </section>
       )}
 
-      {formOpen && (
+      {form.open && (
         <InjuryFormModal
           teamId={team.id}
           players={playerList}
           injuredPlayerIds={new Set(active.map((i) => i.player))}
-          injury={editing}
-          onClose={() => setFormOpen(false)}
+          injury={form.editing}
+          onClose={form.close}
         />
       )}
     </div>
