@@ -1,12 +1,7 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { matchApi } from "../../core/api/endpoints";
 import { qk } from "../../lib/queryKeys";
-import { notifyError } from "../../lib/notifyError";
+import { useEntityQuery, useInvalidatingMutation } from "../../lib/queryFactory";
 
 const PAST_PAGE_SIZE = 20;
 
@@ -63,11 +58,7 @@ export function usePastMatchesInfinite(teamId: number, nowApi: string) {
 }
 
 export function useMatch(id: number) {
-  return useQuery({
-    queryKey: qk.match(id),
-    queryFn: ({ signal }) => matchApi.read(id, signal),
-    enabled: id > 0,
-  });
+  return useEntityQuery(qk.match(id), matchApi.read, id);
 }
 
 interface MatchInput {
@@ -77,34 +68,23 @@ interface MatchInput {
 }
 
 export function useCreateMatch(teamId: number) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (input: MatchInput) => matchApi.create(input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.matches(teamId) }),
+  return useInvalidatingMutation((input: MatchInput) => matchApi.create(input), {
+    invalidate: () => [qk.matches(teamId)],
   });
 }
 
 export function useUpdateMatch(teamId: number) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (input: MatchInput & { id: number }) => matchApi.update(input),
-    onSuccess: (_d, vars) => {
-      qc.invalidateQueries({ queryKey: qk.matches(teamId) });
-      qc.invalidateQueries({ queryKey: qk.match(vars.id) });
-    },
-  });
+  return useInvalidatingMutation(
+    (input: MatchInput & { id: number }) => matchApi.update(input),
+    { invalidate: (vars) => [qk.matches(teamId), qk.match(vars.id)] },
+  );
 }
 
 export function useDeleteMatch(teamId: number) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: number) => matchApi.remove(id),
-    onSuccess: (_data, id) => {
-      qc.invalidateQueries({ queryKey: qk.matches(teamId) });
-      // Clear the deleted match's detail and quarters cache.
-      qc.removeQueries({ queryKey: qk.match(id) });
-      qc.removeQueries({ queryKey: qk.quarters(id) });
-    },
-    onError: notifyError("경기를 삭제하지 못했습니다."),
+  return useInvalidatingMutation((id: number) => matchApi.remove(id), {
+    invalidate: () => [qk.matches(teamId)],
+    // Clear the deleted match's detail and quarters cache.
+    remove: (matchId) => [qk.match(matchId), qk.quarters(matchId)],
+    errorMessage: "경기를 삭제하지 못했습니다.",
   });
 }

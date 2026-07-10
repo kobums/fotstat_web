@@ -32,6 +32,5 @@
 }
 
 .error {
-  font-size: 13px;
-  color: var(--neg);
+  composes: error from "../../styles/shared.module.css";
 }

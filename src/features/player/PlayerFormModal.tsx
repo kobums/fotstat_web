@@ -4,9 +4,10 @@ import Modal from "../../components/Modal/Modal";
 import TextField from "../../components/TextField/TextField";
 import Select from "../../components/Select/Select";
 import DatePicker from "../../components/DatePicker/DatePicker";
-import { ApiError } from "../../core/api/client";
 import type { Player } from "../../core/api/types";
+import { today } from "../../lib/date";
 import { POSITION_OPTIONS } from "../../lib/position";
+import { useEntityForm } from "../shared/useEntityForm";
 import { useCreatePlayer, useUpdatePlayer } from "./usePlayers";
 import { validatePlayerForm, MIN_NUMBER, MAX_NUMBER } from "./playerForm";
 import styles from "./PlayerFormModal.module.css";
@@ -24,35 +25,30 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
   );
   const [position, setPosition] = useState(player?.position ?? "ST");
   const [birthdate, setBirthdate] = useState(player?.birthdate ?? "");
-  const [error, setError] = useState<string | null>(null);
-  // Births can't be in the future; cap the calendar at today.
-  const today = new Date().toISOString().slice(0, 10);
+  // Births can't be in the future; cap the calendar at today. Use the local
+  // day (today()); toISOString() would be UTC and roll to "yesterday" before
+  // 09:00 KST, blocking today from being selectable.
+  const maxBirthdate = today();
   const create = useCreatePlayer(teamId);
   const update = useUpdatePlayer(teamId);
-  const editing = !!player;
+  const { editing, pending, error, setError, submit } = useEntityForm({
+    entity: player,
+    create,
+    update,
+    onClose,
+  });
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const result = validatePlayerForm(name, number);
     if (!result.ok) return setError(result.error);
-    setError(null);
-    try {
-      const input = {
-        team: teamId,
-        name: result.value.name,
-        number: result.value.number,
-        birthdate,
-        position,
-      };
-      if (editing && player) {
-        await update.mutateAsync({ ...input, id: player.id });
-      } else {
-        await create.mutateAsync(input);
-      }
-      onClose();
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "저장에 실패했습니다.");
-    }
+    await submit({
+      team: teamId,
+      name: result.value.name,
+      number: result.value.number,
+      birthdate,
+      position,
+    });
   }
 
   return (
@@ -90,13 +86,13 @@ export default function PlayerFormModal({ teamId, player, onClose }: Props) {
           <DatePicker
             value={birthdate}
             onChange={setBirthdate}
-            max={today}
+            max={maxBirthdate}
             placeholder="생년월일 (선택)"
             aria-label="생년월일"
           />
         </div>
         {error && <div className={styles.error}>{error}</div>}
-        <Button type="submit" loading={create.isPending || update.isPending}>
+        <Button type="submit" loading={pending}>
           {editing ? "저장" : "추가"}
         </Button>
       </form>

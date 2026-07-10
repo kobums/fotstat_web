@@ -46,3 +46,29 @@ export function EmptyView({
     </div>
   );
 }
+
+// The loading -> error -> empty branch every list page repeated. Renders the
+// first applicable state (in that precedence) or nothing when data is present
+// and non-empty, so the page's content list can render alongside it.
+export function StatusView({
+  isLoading,
+  loadingLabel,
+  isError,
+  errorMessage,
+  onRetry,
+  isEmpty = false,
+  empty,
+}: {
+  isLoading: boolean;
+  loadingLabel?: string;
+  isError: boolean;
+  errorMessage: string;
+  onRetry?: () => void;
+  isEmpty?: boolean;
+  empty?: ReactNode;
+}) {
+  if (isLoading) return <LoadingView label={loadingLabel} />;
+  if (isError) return <ErrorView message={errorMessage} onRetry={onRetry} />;
+  if (isEmpty) return <>{empty}</>;
+  return null;
+}

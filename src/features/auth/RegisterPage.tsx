@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import TextField from "../../components/TextField/TextField";
 import { useAuth } from "../../core/auth/AuthContext";
-import { ApiError } from "../../core/api/client";
+import { errorMessage } from "../../lib/notifyError";
+import AuthScreen from "./AuthScreen";
 import styles from "./auth.module.css";
 
 export default function RegisterPage() {
@@ -23,53 +24,50 @@ export default function RegisterPage() {
       await register(email.trim(), password, name.trim());
       navigate("/myteam", { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "회원가입에 실패했습니다.");
+      setError(errorMessage(err, "회원가입에 실패했습니다."));
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <main className={styles.screen}>
-      <div className={styles.card}>
-        <div className={styles.brand}>
-          <div className={styles.brandMark}>회원가입</div>
-          <div className={styles.brandSub}>fotstat 계정 만들기</div>
-        </div>
-
-        <form className={styles.form} onSubmit={onSubmit}>
-          <TextField
-            label="이름"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <TextField
-            label="이메일"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <TextField
-            label="비밀번호"
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {error && <div className={styles.formError}>{error}</div>}
-          <Button type="submit" loading={pending}>
-            가입하기
-          </Button>
-        </form>
-
-        <div className={styles.footer}>
+    <AuthScreen
+      brandMark="회원가입"
+      brandSub="fotstat 계정 만들기"
+      footer={
+        <>
           이미 계정이 있으신가요? <Link to="/login">로그인</Link>
-        </div>
-      </div>
-    </main>
+        </>
+      }
+    >
+      <form className={styles.form} onSubmit={onSubmit}>
+        <TextField
+          label="이름"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <TextField
+          label="이메일"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <TextField
+          label="비밀번호"
+          type="password"
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        {error && <div className={styles.formError}>{error}</div>}
+        <Button type="submit" loading={pending}>
+          가입하기
+        </Button>
+      </form>
+    </AuthScreen>
   );
 }

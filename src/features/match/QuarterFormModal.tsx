@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import Button from "../../components/Button/Button";
 import Modal from "../../components/Modal/Modal";
 import TextField from "../../components/TextField/TextField";
-import { ApiError } from "../../core/api/client";
+import { errorMessage } from "../../lib/notifyError";
 import { useCreateQuarter } from "./useQuarters";
 import styles from "./QuarterFormModal.module.css";
 
@@ -33,7 +33,7 @@ export default function QuarterFormModal({
       await create.mutateAsync({ number: nextNumber, duration: dur });
       onClose();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "저장에 실패했습니다.");
+      setError(errorMessage(err, "저장에 실패했습니다."));
     }
   }
 

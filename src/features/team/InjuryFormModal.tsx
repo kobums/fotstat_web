@@ -4,9 +4,9 @@ import Modal from "../../components/Modal/Modal";
 import Select from "../../components/Select/Select";
 import TextField from "../../components/TextField/TextField";
 import DatePicker from "../../components/DatePicker/DatePicker";
-import { ApiError } from "../../core/api/client";
 import type { Injury, Player } from "../../core/api/types";
-import { today } from "../../lib/date";
+import { dayOf, today } from "../../lib/date";
+import { useEntityForm } from "../shared/useEntityForm";
 import {
   useCreateInjury,
   useDeleteInjury,
@@ -33,7 +33,6 @@ export default function InjuryFormModal({
   defaultStartdate,
   onClose,
 }: Props) {
-  const editing = !!injury;
   const [player, setPlayer] = useState<number>(
     injury?.player ??
       players.find((p) => !injuredPlayerIds.has(p.id))?.id ??
@@ -42,21 +41,24 @@ export default function InjuryFormModal({
   );
   const [type, setType] = useState(injury?.type ?? "");
   const [startdate, setStartdate] = useState(() => {
-    const preset = (injury?.startdate ?? "").slice(0, 10) || defaultStartdate || today();
+    const preset = dayOf(injury?.startdate) || defaultStartdate || today();
     return preset > today() ? today() : preset;
   });
   const [hasReturned, setHasReturned] = useState(
     !!(injury?.returndate ?? "").trim(),
   );
-  const [returndate, setReturndate] = useState(
-    (injury?.returndate ?? "").slice(0, 10),
-  );
+  const [returndate, setReturndate] = useState(dayOf(injury?.returndate));
   const [memo, setMemo] = useState(injury?.memo ?? "");
-  const [error, setError] = useState<string | null>(null);
 
   const create = useCreateInjury(teamId);
   const update = useUpdateInjury(teamId);
   const del = useDeleteInjury(teamId);
+  const { editing, pending, error, setError, submit } = useEntityForm({
+    entity: injury,
+    create,
+    update,
+    onClose,
+  });
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -65,24 +67,13 @@ export default function InjuryFormModal({
     if (hasReturned && !returndate) return setError("복귀일을 선택해주세요.");
     if (hasReturned && returndate < startdate)
       return setError("복귀일은 발생일 이후여야 합니다.");
-    setError(null);
-    const input = {
+    await submit({
       player,
       type,
       startdate,
       returndate: hasReturned ? returndate : "",
       memo,
-    };
-    try {
-      if (editing && injury) {
-        await update.mutateAsync({ ...input, id: injury.id });
-      } else {
-        await create.mutateAsync(input);
-      }
-      onClose();
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "저장에 실패했습니다.");
-    }
+    });
   }
 
   async function onDelete() {
@@ -160,10 +151,7 @@ export default function InjuryFormModal({
         {error && <div className={styles.error}>{error}</div>}
 
         <div className={styles.actions}>
-          <Button
-            type="submit"
-            loading={create.isPending || update.isPending}
-          >
+          <Button type="submit" loading={pending}>
             {editing ? "저장" : "등록"}
           </Button>
           {editing && (

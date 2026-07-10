@@ -1,11 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
-import {
-  EmptyView,
-  ErrorView,
-  LoadingView,
-} from "../../components/StateView/StateView";
+import { EmptyView, StatusView } from "../../components/StateView/StateView";
 import { toApiDateSeconds } from "../../lib/date";
 import { useTeamContext } from "../team/teamContext";
 import { usePastMatchesInfinite, useUpcomingMatches } from "./useMatches";
@@ -47,22 +43,22 @@ export default function MatchListPage() {
         </Button>
       </div>
 
-      {isLoading && <LoadingView />}
-      {isError && (
-        <ErrorView
-          message="경기를 불러오지 못했습니다."
-          onRetry={() => {
-            upcoming.refetch();
-            past.refetch();
-          }}
-        />
-      )}
-      {isEmpty && (
-        <EmptyView
-          title="경기가 없습니다"
-          description="경기를 추가하고 쿼터별 기록을 남겨보세요."
-        />
-      )}
+      <StatusView
+        isLoading={isLoading}
+        isError={isError}
+        errorMessage="경기를 불러오지 못했습니다."
+        onRetry={() => {
+          upcoming.refetch();
+          past.refetch();
+        }}
+        isEmpty={isEmpty}
+        empty={
+          <EmptyView
+            title="경기가 없습니다"
+            description="경기를 추가하고 쿼터별 기록을 남겨보세요."
+          />
+        }
+      />
 
       {upcomingList.length > 0 && (
         <section className={styles.section}>

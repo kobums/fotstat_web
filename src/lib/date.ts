@@ -88,6 +88,15 @@ export function isUpcoming(apiDate: string, now: Date): boolean {
   return d ? d.getTime() >= now.getTime() : false;
 }
 
+/** Leading calendar day of an API date/datetime string
+ *  ("YYYY-MM-DD" or "YYYY-MM-DD HH:mm:ss" -> "YYYY-MM-DD"). The format is
+ *  fixed-width so the 10-char prefix is the day; empty for nullish input.
+ *  Note: this is a string slice (no timezone conversion) — use toDayKey when
+ *  you need the *local* calendar day of a datetime. */
+export function dayOf(date: string | null | undefined): string {
+  return (date ?? "").slice(0, 10);
+}
+
 /** "YYYY-MM-DD HH:mm:ss" -> local "YYYY-MM-DD" (calendar day key). */
 export function toDayKey(apiDate: string): string {
   const d = parseMatchDate(apiDate);

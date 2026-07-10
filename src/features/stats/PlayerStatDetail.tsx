@@ -3,9 +3,10 @@ import Modal from "../../components/Modal/Modal";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import PosChip from "../../components/PosChip/PosChip";
 import StatTile from "../../components/StatTile/StatTile";
-import ResultPill, { resultOf } from "../../components/ResultPill/ResultPill";
+import ResultPill from "../../components/ResultPill/ResultPill";
+import { resultOf } from "../../lib/matchResult";
 import { topPercent } from "../../lib/percentile";
-import { formatMatchDate } from "../../lib/date";
+import { dayOf, formatMatchDate } from "../../lib/date";
 import { isActiveInjury } from "../../lib/injury";
 import type { Injury, Match, MatchRecord, Quarter } from "../../core/api/types";
 import type { PlayerStat } from "./useTeamStats";
@@ -32,7 +33,7 @@ interface Props {
 
 /** "YYYY-MM-DD" → "MM.DD" (부상 기간 표기용). */
 function shortDay(date?: string): string {
-  const d = (date ?? "").slice(0, 10);
+  const d = dayOf(date);
   return d.length === 10 ? `${d.slice(5, 7)}.${d.slice(8, 10)}` : d;
 }
 

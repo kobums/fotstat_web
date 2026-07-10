@@ -1,12 +1,9 @@
 import { useMemo } from "react";
-import { useQueries } from "@tanstack/react-query";
-import { quarterApi, recordApi } from "../../core/api/endpoints";
 import type { Injury, Match, MatchRecord, Quarter } from "../../core/api/types";
-import { qk } from "../../lib/queryKeys";
-import { combineLists } from "../../lib/combineQueries";
 import { parseMatchDate } from "../../lib/date";
 import { usePlayers } from "../player/usePlayers";
 import { useMatches } from "../match/useMatches";
+import { useQuarterRecords } from "../match/useQuarterRecords";
 import { useInjuries } from "../team/useInjuries";
 import { aggregateTeamStats } from "./aggregateTeamStats";
 import type { PlayerStat } from "./aggregateTeamStats";
@@ -70,54 +67,27 @@ export function useTeamStats(
     return list;
   }, [matches.data, start, end]);
 
-  // `combine` flattens the per-query results and applies react-query's
-  // structural sharing, so `.data` stays referentially stable across renders
-  // when the underlying data is unchanged — letting the aggregate useMemo below
-  // actually memoize (a raw useQueries array is a new reference every render).
-  const quarters = useQueries({
-    queries: matchList.map((m) => ({
-      queryKey: qk.quarters(m.id),
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        quarterApi.list(m.id, signal),
-      enabled: m.id > 0,
-    })),
-    combine: combineLists,
-  });
-  const allQuarters: Quarter[] = quarters.data;
-
-  const records = useQueries({
-    queries: allQuarters.map((q) => ({
-      queryKey: qk.records(q.id),
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        recordApi.list(q.id, signal),
-      enabled: q.id > 0,
-    })),
-    combine: combineLists,
-  });
+  // Shared fan-out (quarters -> records). `combineLists` keeps `.data`
+  // referentially stable across renders, letting the aggregate useMemo below
+  // actually memoize.
+  const { quarters: allQuarters, records, isLoading: qrLoading, isError: qrError } =
+    useQuarterRecords(matchList);
 
   const isLoading =
-    players.isLoading ||
-    matches.isLoading ||
-    injuries.isLoading ||
-    quarters.isLoading ||
-    records.isLoading;
+    players.isLoading || matches.isLoading || injuries.isLoading || qrLoading;
   const isError =
-    players.isError ||
-    matches.isError ||
-    injuries.isError ||
-    quarters.isError ||
-    records.isError;
+    players.isError || matches.isError || injuries.isError || qrError;
 
   const aggregate = useMemo(
     () =>
       aggregateTeamStats(
         allQuarters,
-        records.data,
+        records,
         players.data ?? [],
         injuries.data ?? [],
         matchList,
       ),
-    [allQuarters, records.data, players.data, injuries.data, matchList],
+    [allQuarters, records, players.data, injuries.data, matchList],
   );
 
   return {
@@ -126,7 +96,7 @@ export function useTeamStats(
     ...aggregate,
     matches: matchList,
     quarters: allQuarters,
-    records: records.data,
+    records,
     injuries: injuries.data ?? [],
   };
 }

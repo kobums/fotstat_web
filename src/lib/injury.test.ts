@@ -3,9 +3,11 @@ import type { Injury, Match } from "../core/api/types";
 import {
   absentGamesFor,
   absentGamesForInjury,
+  activeInjuriesSorted,
   injuredPlayerIdsOn,
   injuryCoversMatch,
   isActiveInjury,
+  pastInjuriesSorted,
 } from "./injury";
 
 function injury(p: Partial<Injury> & Pick<Injury, "id" | "player">): Injury {
@@ -25,6 +27,27 @@ describe("isActiveInjury", () => {
     expect(
       isActiveInjury(injury({ id: 1, player: 1, returndate: "2026-06-20" })),
     ).toBe(false);
+  });
+});
+
+describe("activeInjuriesSorted / pastInjuriesSorted", () => {
+  const list: Injury[] = [
+    injury({ id: 1, player: 1, startdate: "2026-05-01", returndate: "" }),
+    injury({ id: 2, player: 2, startdate: "2026-05-10", returndate: "2026-05-20" }),
+    injury({ id: 3, player: 3, startdate: "2026-05-15", returndate: "" }),
+  ];
+
+  it("active만 골라 발생일 내림차순 정렬", () => {
+    expect(activeInjuriesSorted(list).map((i) => i.id)).toEqual([3, 1]);
+  });
+  it("복귀 완료(past)만 골라 정렬", () => {
+    expect(pastInjuriesSorted(list).map((i) => i.id)).toEqual([2]);
+  });
+  it("원본 배열을 변형하지 않는다", () => {
+    const before = list.map((i) => i.id);
+    activeInjuriesSorted(list);
+    pastInjuriesSorted(list);
+    expect(list.map((i) => i.id)).toEqual(before);
   });
 });
 

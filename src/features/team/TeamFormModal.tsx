@@ -2,8 +2,8 @@ import { useState, type FormEvent } from 'react'
 import Button from '../../components/Button/Button'
 import Modal from '../../components/Modal/Modal'
 import TextField from '../../components/TextField/TextField'
-import { ApiError } from '../../core/api/client'
 import type { Team } from '../../core/api/types'
+import { useEntityForm } from '../shared/useEntityForm'
 import { useCreateTeam, useUpdateTeam } from './useTeams'
 import styles from './TeamFormModal.module.css'
 
@@ -17,11 +17,15 @@ interface Props {
 export default function TeamFormModal({ team, onClose }: Props) {
   const [name, setName] = useState(team?.name ?? '')
   const [duration, setDuration] = useState(String(team?.duration ?? 45))
-  const [error, setError] = useState<string | null>(null)
   const [durationError, setDurationError] = useState<string | null>(null)
   const create = useCreateTeam()
   const update = useUpdateTeam()
-  const editing = !!team
+  const { editing, pending, error, setError, submit } = useEntityForm({
+    entity: team,
+    create,
+    update,
+    onClose,
+  })
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -37,16 +41,7 @@ export default function TeamFormModal({ team, onClose }: Props) {
       return
     }
     setDurationError(null)
-    try {
-      if (editing && team) {
-        await update.mutateAsync({ id: team.id, name: trimmed, duration: dur })
-      } else {
-        await create.mutateAsync({ name: trimmed, duration: dur })
-      }
-      onClose()
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : '저장에 실패했습니다.')
-    }
+    await submit({ name: trimmed, duration: dur })
   }
 
   return (
@@ -64,7 +59,7 @@ export default function TeamFormModal({ team, onClose }: Props) {
           placeholder="45"
           error={durationError ?? undefined}
         />
-        <Button type="submit" loading={create.isPending || update.isPending}>
+        <Button type="submit" loading={pending}>
           {editing ? '저장' : '추가'}
         </Button>
       </form>

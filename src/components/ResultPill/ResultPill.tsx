@@ -1,12 +1,5 @@
 import styles from "./ResultPill.module.css";
-
-export type Result = "W" | "D" | "L";
-
-export function resultOf(homeGoals: number, awayGoals: number): Result {
-  if (homeGoals > awayGoals) return "W";
-  if (homeGoals < awayGoals) return "L";
-  return "D";
-}
+import type { Result } from "../../lib/matchResult";
 
 const COLOR: Record<Result, string> = {
   W: "var(--pos)",

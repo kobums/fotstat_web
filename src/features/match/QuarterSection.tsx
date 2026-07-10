@@ -5,6 +5,7 @@ import Stepper from "../../components/Stepper/Stepper";
 import type { MatchRecord, Player, Quarter } from "../../core/api/types";
 import { rebalanceAssists } from "../../lib/assistCap";
 import { notifyError } from "../../lib/notifyError";
+import { sumAssists, sumGoals } from "../../lib/records";
 import { useDeleteQuarter, useUpdateAwaygoals } from "./useQuarters";
 import { useDeleteRecord, useUpdateRecord } from "./useRecords";
 import RecordFormModal from "./RecordFormModal";
@@ -56,8 +57,8 @@ export default function QuarterSection({
     () => new Map(players.map((p) => [p.id, p])),
     [players],
   );
-  const homeGoals = records.reduce((s, r) => s + r.goal, 0);
-  const assistTotal = records.reduce((s, r) => s + r.assist, 0);
+  const homeGoals = sumGoals(records);
+  const assistTotal = sumAssists(records);
   const takenPlayerIds = useMemo(
     () => new Set(records.map((r) => r.player)),
     [records],

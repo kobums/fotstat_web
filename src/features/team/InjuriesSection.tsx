@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import type { Match } from "../../core/api/types";
-import { absentGamesForInjury, isActiveInjury } from "../../lib/injury";
+import { dayOf } from "../../lib/date";
+import { absentGamesForInjury, activeInjuriesSorted } from "../../lib/injury";
 import { usePlayers } from "../player/usePlayers";
 import { useInjuries } from "./useInjuries";
 import styles from "./InjuriesSection.module.css";
@@ -22,10 +23,7 @@ export default function InjuriesSection({ teamId, matches }: Props) {
   );
 
   const active = useMemo(
-    () =>
-      (injuries ?? [])
-        .filter(isActiveInjury)
-        .sort((a, b) => (b.startdate ?? "").localeCompare(a.startdate ?? "")),
+    () => activeInjuriesSorted(injuries ?? []),
     [injuries],
   );
 
@@ -62,9 +60,7 @@ export default function InjuriesSection({ teamId, matches }: Props) {
                   결장 {absentGamesForInjury(injury, matches)}경기
                 </span>
                 {injury.startdate && (
-                  <span className={styles.since}>
-                    {injury.startdate.slice(0, 10)}~
-                  </span>
+                  <span className={styles.since}>{dayOf(injury.startdate)}~</span>
                 )}
               </div>
             </div>

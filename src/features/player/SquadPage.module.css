@@ -1,15 +1,9 @@
 .toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--sp-3);
+  composes: toolbar from "../../styles/shared.module.css";
 }
 
 .count {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  color: var(--text-sec);
+  composes: count from "../../styles/shared.module.css";
 }
 
 .group {

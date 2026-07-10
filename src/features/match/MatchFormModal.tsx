@@ -3,9 +3,9 @@ import Button from '../../components/Button/Button'
 import Modal from '../../components/Modal/Modal'
 import TextField from '../../components/TextField/TextField'
 import DateTimePicker from '../../components/DateTimePicker/DateTimePicker'
-import { ApiError } from '../../core/api/client'
 import type { Match } from '../../core/api/types'
 import { fromInputValue, nowInputValue, toInputValue } from '../../lib/date'
+import { useEntityForm } from '../shared/useEntityForm'
 import { useCreateMatch, useUpdateMatch } from './useMatches'
 import styles from './MatchFormModal.module.css'
 
@@ -18,10 +18,14 @@ interface Props {
 export default function MatchFormModal({ teamId, match, onClose }: Props) {
   const [awayname, setAwayname] = useState(match?.awayname ?? '')
   const [when, setWhen] = useState(match ? toInputValue(match.matchdate) : nowInputValue())
-  const [error, setError] = useState<string | null>(null)
   const create = useCreateMatch(teamId)
   const update = useUpdateMatch(teamId)
-  const editing = !!match
+  const { editing, pending, error, setError, submit } = useEntityForm({
+    entity: match,
+    create,
+    update,
+    onClose,
+  })
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -29,18 +33,7 @@ export default function MatchFormModal({ teamId, match, onClose }: Props) {
     if (!away) return setError('상대팀 이름을 입력해주세요.')
     const matchdate = fromInputValue(when)
     if (!matchdate) return setError('경기 일시를 선택해주세요.')
-    setError(null)
-    try {
-      const input = { team: teamId, awayname: away, matchdate }
-      if (editing && match) {
-        await update.mutateAsync({ ...input, id: match.id })
-      } else {
-        await create.mutateAsync(input)
-      }
-      onClose()
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : '저장에 실패했습니다.')
-    }
+    await submit({ team: teamId, awayname: away, matchdate })
   }
 
   return (
@@ -52,7 +45,7 @@ export default function MatchFormModal({ teamId, match, onClose }: Props) {
           <DateTimePicker value={when} onChange={setWhen} minuteStep={10} />
         </div>
         {error && <div className={styles.error}>{error}</div>}
-        <Button type="submit" loading={create.isPending || update.isPending}>
+        <Button type="submit" loading={pending}>
           {editing ? '저장' : '추가'}
         </Button>
       </form>
