@@ -1,0 +1,90 @@
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-3);
+}
+
+.date {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-sec);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--bg-elev);
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+}
+
+.row:first-child {
+  border-top: none;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.player input {
+  flex-shrink: 0;
+}
+
+.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.injured {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--neg);
+  background: color-mix(in srgb, var(--neg) 12%, transparent);
+  border-radius: var(--r-sm);
+  padding: 2px 6px;
+}
+
+.actions {
+  margin-top: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.error {
+  composes: error from "../../styles/shared.module.css";
+  margin-top: var(--sp-3);
+}

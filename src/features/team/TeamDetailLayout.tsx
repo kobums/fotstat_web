@@ -12,6 +12,7 @@ const TABS = [
   { to: "squad", label: "스쿼드", end: false },
   { to: "injuries", label: "부상", end: false },
   { to: "matches", label: "경기", end: false },
+  { to: "trainings", label: "훈련", end: false },
   { to: "stats", label: "통계", end: false },
   { to: "report", label: "리포트", end: false },
 ];

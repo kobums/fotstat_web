@@ -1,0 +1,143 @@
+.toolbar {
+  composes: toolbar from "../../styles/shared.module.css";
+}
+
+.count {
+  composes: count from "../../styles/shared.module.css";
+}
+
+.group {
+  margin-bottom: var(--sp-4);
+}
+
+.groupTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-sec);
+  margin-bottom: var(--sp-2);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--bg-elev);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--line);
+}
+
+.row:first-child {
+  border-top: none;
+}
+
+.rowMain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+}
+
+.main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.upcoming {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-sec);
+  background: var(--bg-elev3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 2px 6px;
+}
+
+.attended {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.edit {
+  flex-shrink: 0;
+  margin-right: 12px;
+  background: var(--accent-soft);
+  border: none;
+  border-radius: var(--r-md);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.edit:hover {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.statRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--line);
+}
+
+.statRow:first-child {
+  border-top: none;
+}
+
+.statName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.statMain {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.statSub {
+  font-size: 10px;
+  color: var(--text-ter);
+}
