@@ -105,6 +105,31 @@ export interface Attendance {
   updateddate?: string;
 }
 
+/** 선수 인바디(체성분) 측정 1건. 검사일 외 측정치는 전부 선택 —
+ *  서버가 NULL을 0으로 내려주므로 0 = 미측정으로 취급한다. */
+export interface Inbody {
+  id: number;
+  player: number;
+  /** "YYYY-MM-DD" */
+  testdate: string;
+  /** 신장(cm). 0 = 미측정 */
+  height: number;
+  /** 체중(kg). 0 = 미측정 */
+  weight: number;
+  /** 골격근량(kg). 0 = 미측정 */
+  muscle: number;
+  /** 체지방률(%). 0 = 미측정 */
+  fat: number;
+  /** 오른다리 근육량(kg). 0 = 미측정 */
+  rightleg: number;
+  /** 왼다리 근육량(kg). 0 = 미측정 */
+  leftleg: number;
+  /** 인바디 점수. 0 = 미측정 */
+  score: number;
+  createddate?: string;
+  updateddate?: string;
+}
+
 // ---- Response envelopes (controllers.go) ----
 
 export interface AuthResponse {

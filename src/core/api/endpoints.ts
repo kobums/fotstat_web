@@ -6,6 +6,7 @@ import type {
   Attendance,
   AuthResponse,
   CodeResponse,
+  Inbody,
   Injury,
   ItemResponse,
   ItemsResponse,
@@ -174,6 +175,38 @@ export const injuryApi = {
   update: (injury: InjuryInput & { id: number }) =>
     api.put<CodeResponse>("/injury", injury),
   remove: (id: number) => api.del<CodeResponse>("/injury", { id }),
+};
+
+// ---- Inbody ----
+
+/** 측정치는 0 = 미측정(서버가 NULL 저장). testdate만 필수. */
+export interface InbodyInput {
+  player: number;
+  /** "YYYY-MM-DD" */
+  testdate: string;
+  height: number;
+  weight: number;
+  muscle: number;
+  fat: number;
+  rightleg: number;
+  leftleg: number;
+  score: number;
+}
+
+export const inbodyApi = {
+  /** 팀 전체 측정 이력 — 선수별 그룹핑·최신값은 클라이언트에서 계산한다. */
+  list: (teamId: number, signal?: AbortSignal) =>
+    api
+      .get<ItemsResponse<Inbody>>("/inbody", { team: teamId }, signal)
+      .then(items),
+  /** (player, testdate)는 UNIQUE — 같은 검사일 재저장은 upsert로 값만 갱신된다. */
+  create: (input: InbodyInput) => api.post<CodeResponse>("/inbody", input),
+  update: (inbody: InbodyInput & { id: number }) =>
+    api.put<CodeResponse>("/inbody", inbody),
+  remove: (id: number) => api.del<CodeResponse>("/inbody", { id }),
+  /** 시트 일괄 입력 — 행 단위 upsert. */
+  createBatch: (inputs: InbodyInput[]) =>
+    api.post<CodeResponse>("/inbody/batch", inputs),
 };
 
 // ---- Training ----
