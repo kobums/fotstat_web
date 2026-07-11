@@ -14,6 +14,9 @@ interface Props {
   marked: Set<string>;
   /** Per-day match summaries keyed by "YYYY-MM-DD", rendered inline in each cell. */
   info?: Map<string, DayMatch[]>;
+  /** Per-day training times keyed by "YYYY-MM-DD" (e.g. "19:00"). 해당 날짜는
+   *  경기와 구분되는 훈련 마커가 붙고 선택 가능해진다. */
+  trainings?: Map<string, string[]>;
   /** Opt-in: recurring player-birthday days as "MM-DD" (yearly, any year).
    *  Matching cells get a small cake marker and become selectable. */
   birthdays?: Set<string>;
@@ -30,6 +33,7 @@ function ymd(y: number, m: number, d: number): string {
 export default function Calendar({
   marked,
   info,
+  trainings,
   birthdays,
   selected,
   onSelect,
@@ -81,13 +85,16 @@ export default function Calendar({
           if (d === null) return <span key={`b${i}`} />;
           const date = ymd(view.year, view.month, d);
           const has = marked.has(date);
+          const dayTrainings = trainings?.get(date);
+          const hasTraining = !!dayTrainings && dayTrainings.length > 0;
           const isBirthday = !!birthdays?.has(date.slice(5));
-          const clickable = has || isBirthday;
+          const clickable = has || hasTraining || isBirthday;
           const dayInfo = has ? info?.get(date) : undefined;
           const hasEvents = !!dayInfo && dayInfo.length > 0;
           const cls = [
             styles.day,
             has ? styles.has : "",
+            hasTraining ? styles.trainingDay : "",
             isBirthday ? styles.bdayDay : "",
             date === selected ? styles.selected : "",
             date === todayStr ? styles.today : "",
@@ -108,12 +115,18 @@ export default function Calendar({
                 </span>
               )}
               {has && !hasEvents && <span className={styles.dot} />}
-              {hasEvents && (
+              {(hasEvents || hasTraining) && (
                 <span className={styles.events}>
-                  {dayInfo!.map((m, j) => (
+                  {dayInfo?.map((m, j) => (
                     <span key={`${m.time}-${m.away}-${j}`} className={styles.event}>
                       <span className={styles.eventTime}>{m.time}</span>
                       <span className={styles.eventAway}>{m.away}</span>
+                    </span>
+                  ))}
+                  {dayTrainings?.map((time, j) => (
+                    <span key={`t${time}-${j}`} className={`${styles.event} ${styles.trainingEvent}`}>
+                      <span className={styles.eventTime}>{time}</span>
+                      <span className={styles.eventAway}>훈련</span>
                     </span>
                   ))}
                 </span>

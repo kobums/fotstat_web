@@ -21,6 +21,7 @@ import MatchRowList from "../match/MatchRowList";
 import { usePlayers } from "../player/usePlayers";
 import InjuriesSection from "./InjuriesSection";
 import { useTeamContext } from "./teamContext";
+import { useTrainings } from "./useTrainings";
 import styles from "./TeamOverview.module.css";
 
 export default function TeamOverview() {
@@ -29,6 +30,7 @@ export default function TeamOverview() {
   const { data: matches } = useMatches(team.id);
   const { results } = useMatchResults(team.id);
   const { data: players } = usePlayers(team.id);
+  const { data: trainings } = useTrainings(team.id);
   const [selectedDay, setSelectedDay] = useState("");
 
   const now = useMemo(() => new Date(), []);
@@ -95,6 +97,32 @@ export default function TeamOverview() {
     [list, selectedDay],
   );
 
+  // 훈련 — 캘린더 마커(날짜별 시간 목록)와 선택한 날짜의 훈련 목록
+  const trainingList = useMemo(() => trainings ?? [], [trainings]);
+  const trainingDays = useMemo(() => {
+    const sorted = [...trainingList].sort((a, b) =>
+      a.trainingdate.localeCompare(b.trainingdate),
+    );
+    const map = new Map<string, string[]>();
+    for (const t of sorted) {
+      const key = toDayKey(t.trainingdate);
+      if (!key) continue;
+      const entry = map.get(key) ?? [];
+      entry.push(formatMatchTime(t.trainingdate));
+      map.set(key, entry);
+    }
+    return map;
+  }, [trainingList]);
+  const dayTrainings = useMemo(
+    () =>
+      selectedDay
+        ? trainingList
+            .filter((t) => toDayKey(t.trainingdate) === selectedDay)
+            .sort((a, b) => a.trainingdate.localeCompare(b.trainingdate))
+        : [],
+    [trainingList, selectedDay],
+  );
+
   const squad = useMemo(() => players ?? [], [players]);
   const birthdayDays = useMemo(() => birthdayMonthDays(squad), [squad]);
   const dayBirthdays = useMemo(
@@ -146,6 +174,7 @@ export default function TeamOverview() {
         <Calendar
           marked={marked}
           info={dayInfo}
+          trainings={trainingDays}
           birthdays={birthdayDays}
           selected={selectedDay}
           onSelect={setSelectedDay}
@@ -158,6 +187,23 @@ export default function TeamOverview() {
                   vs {m.awayname}
                   <span className={styles.dayTime}>
                     {formatMatchDate(m.matchdate)}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {selectedDay && dayTrainings.length > 0 && (
+          <ul className={styles.dayList}>
+            {dayTrainings.map((t) => (
+              <li key={t.id}>
+                <button
+                  className={styles.dayItem}
+                  onClick={() => navigate(`/teams/${team.id}/trainings`)}
+                >
+                  훈련
+                  <span className={styles.dayTime}>
+                    {formatMatchDate(t.trainingdate)}
                   </span>
                 </button>
               </li>
@@ -179,9 +225,12 @@ export default function TeamOverview() {
             })}
           </ul>
         )}
-        {selectedDay && dayMatches.length === 0 && dayBirthdays.length === 0 && (
-          <p className={styles.dayEmpty}>이 날은 경기가 없습니다.</p>
-        )}
+        {selectedDay &&
+          dayMatches.length === 0 &&
+          dayTrainings.length === 0 &&
+          dayBirthdays.length === 0 && (
+            <p className={styles.dayEmpty}>이 날은 일정이 없습니다.</p>
+          )}
       </section>
 
       {nextMatch && (
