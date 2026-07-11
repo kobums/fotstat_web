@@ -36,7 +36,9 @@ const COLUMNS: { key: keyof InbodyRowDraft; label: string }[] = [
 /** 엑셀 시트를 대체하는 팀 일괄 입력 — 공통 검사일 1개 + 선수 행별 측정값.
  *  (player, testdate) upsert라 같은 날짜로 재저장해도 값만 갱신된다. */
 export default function InbodySheetModal({ teamId, players, onClose }: Props) {
-  const { data: inbodies } = useInbodies(teamId);
+  // isLoading 동안 저장을 막는다 — 기존 측정 프리필이 로드되기 전에 저장하면
+  // 미입력 필드가 전부 0(미측정)으로 upsert 되어 기존 값을 덮어쓸 수 있다
+  const { data: inbodies, isLoading } = useInbodies(teamId);
   const save = useSaveInbodies(teamId);
   const [testdate, setTestdate] = useState(today());
   // 사용자가 입력한 값만 보관 — 표시는 (입력값 ?? 해당 검사일 기존 측정)으로 파생한다.
@@ -177,7 +179,7 @@ export default function InbodySheetModal({ teamId, players, onClose }: Props) {
       {error && <div className={styles.error}>{error}</div>}
 
       <div className={styles.actions}>
-        <Button onClick={onSave} loading={save.isPending}>
+        <Button onClick={onSave} loading={save.isPending} disabled={isLoading}>
           저장
         </Button>
       </div>
