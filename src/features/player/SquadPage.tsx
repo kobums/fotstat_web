@@ -8,6 +8,7 @@ import { EmptyView, StatusView } from "../../components/StateView/StateView";
 import { POSITION_GROUPS, positionGroup } from "../../lib/position";
 import { useTeamContext } from "../team/teamContext";
 import { usePlayers } from "./usePlayers";
+import InbodySheetModal from "./InbodySheetModal";
 import PlayerFormModal from "./PlayerFormModal";
 import styles from "./SquadPage.module.css";
 
@@ -16,6 +17,7 @@ export default function SquadPage() {
   const { data: players, isLoading, isError, refetch } = usePlayers(team.id);
   const navigate = useNavigate();
   const [formOpen, setFormOpen] = useState(false);
+  const [inbodyOpen, setInbodyOpen] = useState(false);
 
   const grouped = useMemo(() => {
     const list = players ?? [];
@@ -33,9 +35,19 @@ export default function SquadPage() {
         <span className={styles.count}>
           {players ? `선수 ${players.length}명` : " "}
         </span>
-        <Button size="sm" fullWidth={false} onClick={() => setFormOpen(true)}>
-          선수 추가
-        </Button>
+        <div className={styles.toolbarActions}>
+          <Button
+            size="sm"
+            fullWidth={false}
+            onClick={() => setInbodyOpen(true)}
+            disabled={!players || players.length === 0}
+          >
+            인바디 입력
+          </Button>
+          <Button size="sm" fullWidth={false} onClick={() => setFormOpen(true)}>
+            선수 추가
+          </Button>
+        </div>
       </div>
 
       <StatusView
@@ -88,6 +100,14 @@ export default function SquadPage() {
           teamId={team.id}
           player={null}
           onClose={() => setFormOpen(false)}
+        />
+      )}
+
+      {inbodyOpen && (
+        <InbodySheetModal
+          teamId={team.id}
+          players={players ?? []}
+          onClose={() => setInbodyOpen(false)}
         />
       )}
     </div>

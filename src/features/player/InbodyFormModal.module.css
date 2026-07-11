@@ -1,0 +1,40 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.field {
+  composes: field from "../../styles/shared.module.css";
+}
+
+.label {
+  composes: label from "../../styles/shared.module.css";
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.delete {
+  align-self: center;
+  background: none;
+  border: none;
+  color: var(--neg);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.error {
+  composes: error from "../../styles/shared.module.css";
+}

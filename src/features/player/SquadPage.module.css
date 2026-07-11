@@ -86,3 +86,8 @@
   color: var(--text-ter);
   flex-shrink: 0;
 }
+
+.toolbarActions {
+  display: flex;
+  gap: var(--sp-2);
+}

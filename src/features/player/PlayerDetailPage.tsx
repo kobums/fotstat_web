@@ -9,6 +9,7 @@ import { ErrorView, LoadingView } from "../../components/StateView/StateView";
 import { ageFrom } from "../../lib/date";
 import { useTeamStats } from "../stats/useTeamStats";
 import { useDeletePlayer, usePlayers } from "./usePlayers";
+import InbodySection from "./InbodySection";
 import PlayerFormModal from "./PlayerFormModal";
 import styles from "./PlayerDetailPage.module.css";
 
@@ -114,6 +115,8 @@ export default function PlayerDetailPage() {
                 <StatTile label="경기당 골" value={goalPg.toFixed(2)} />
               </div>
             )}
+
+            <InbodySection teamId={tId} playerId={pId} />
           </>
         )}
       </main>
