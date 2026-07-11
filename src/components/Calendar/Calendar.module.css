@@ -171,3 +171,25 @@
     min-height: 76px;
   }
 }
+
+/* Training days are selectable even without a match. */
+.trainingDay {
+  cursor: pointer;
+}
+.trainingDay:hover {
+  background: var(--bg-elev2);
+}
+
+.selected.trainingDay {
+  background: var(--accent-soft);
+  color: var(--text);
+  outline: 1px solid var(--accent);
+}
+
+/* Training event pill — 경기(accent)와 구분되는 긍정색(초록) 계열. */
+.trainingEvent {
+  background: color-mix(in srgb, var(--pos) 14%, transparent);
+}
+.trainingEvent .eventTime {
+  color: var(--pos);
+}

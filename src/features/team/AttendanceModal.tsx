@@ -122,16 +122,23 @@ export default function AttendanceModal({
                 <span className={styles.name}>{p.name}</span>
                 {injured && <span className={styles.injured}>부상 중</span>}
               </label>
-              {draft.checked && (
+              {/* Stepper의 row 레이아웃은 width:100%(세로 폼용)라 행의 선수
+                  이름·체크박스를 밀어내므로 고정폭 래퍼 + 단위 라벨로 배치한다.
+                  체크 전에도 자리(visibility:hidden)를 잡아 행 크기가 흔들리지 않게 한다 */}
+              <div
+                className={
+                  draft.checked ? styles.minBox : `${styles.minBox} ${styles.minBoxHidden}`
+                }
+                aria-hidden={!draft.checked}
+              >
                 <Stepper
                   value={draft.min}
                   onChange={(min) => setDraft(p.id, { min })}
                   min={0}
                   max={300}
-                  label="분"
-                  row
                 />
-              )}
+                <span className={styles.minUnit}>분</span>
+              </div>
             </div>
           );
         })}

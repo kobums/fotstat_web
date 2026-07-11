@@ -88,3 +88,21 @@
   composes: error from "../../styles/shared.module.css";
   margin-top: var(--sp-3);
 }
+
+.minBox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.minUnit {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-sec);
+}
+
+/* 체크 전에도 스테퍼 자리를 유지해 행 크기가 흔들리지 않게 한다 */
+.minBoxHidden {
+  visibility: hidden;
+}
