@@ -31,7 +31,7 @@ export default function Stepper({
           className={styles.btn}
           onClick={dec}
           disabled={value <= min}
-          aria-label={`${label ?? ""} 감소`}
+          aria-label={label ? `${label} 감소` : "감소"}
         >
           <Minus size={16} />
         </button>
@@ -41,7 +41,7 @@ export default function Stepper({
           className={styles.btn}
           onClick={inc}
           disabled={value >= max}
-          aria-label={`${label ?? ""} 증가`}
+          aria-label={label ? `${label} 증가` : "증가"}
         >
           <Plus size={16} />
         </button>
