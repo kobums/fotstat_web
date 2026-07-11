@@ -3,6 +3,7 @@ import {
   Bandage,
   BarChart3,
   CalendarDays,
+  Dumbbell,
   FileText,
   Home,
   LogOut,
@@ -28,6 +29,7 @@ const TEAM_TABS = [
   { to: "squad", label: "스쿼드", end: false, Icon: Users },
   { to: "injuries", label: "부상", end: false, Icon: Bandage },
   { to: "matches", label: "경기", end: false, Icon: CalendarDays },
+  { to: "trainings", label: "훈련", end: false, Icon: Dumbbell },
   { to: "stats", label: "통계", end: false, Icon: BarChart3 },
   { to: "report", label: "리포트", end: false, Icon: FileText },
 ];
