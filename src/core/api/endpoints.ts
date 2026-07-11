@@ -3,6 +3,7 @@
 
 import { api } from "./client";
 import type {
+  Attendance,
   AuthResponse,
   CodeResponse,
   Injury,
@@ -13,6 +14,7 @@ import type {
   Player,
   Quarter,
   Team,
+  Training,
 } from "./types";
 
 function items<T>(res: ItemsResponse<T>): T[] {
@@ -172,6 +174,50 @@ export const injuryApi = {
   update: (injury: InjuryInput & { id: number }) =>
     api.put<CodeResponse>("/injury", injury),
   remove: (id: number) => api.del<CodeResponse>("/injury", { id }),
+};
+
+// ---- Training ----
+
+export interface TrainingInput {
+  team: number;
+  /** "YYYY-MM-DD HH:mm:ss" */
+  trainingdate: string;
+}
+
+export const trainingApi = {
+  list: (teamId: number, signal?: AbortSignal) =>
+    api
+      .get<ItemsResponse<Training>>("/training", { team: teamId }, signal)
+      .then(items),
+  create: (input: TrainingInput) => api.post<CodeResponse>("/training", input),
+  update: (training: TrainingInput & { id: number }) =>
+    api.put<CodeResponse>("/training", training),
+  remove: (id: number) => api.del<CodeResponse>("/training", { id }),
+};
+
+// ---- Attendance ----
+
+export interface AttendanceInput {
+  training: number;
+  player: number;
+  /** 선수별 훈련 시간(분). */
+  min: number;
+}
+
+export const attendanceApi = {
+  /** 팀 전체 참석 — 세션별 그룹핑·선수별 집계는 클라이언트에서 한다. */
+  listByTeam: (teamId: number, signal?: AbortSignal) =>
+    api
+      .get<ItemsResponse<Attendance>>("/attendance", { team: teamId }, signal)
+      .then(items),
+  /** (training, player)는 UNIQUE — 서버가 upsert 하므로 재전송 시 min만 갱신된다. */
+  createBatch: (inputs: AttendanceInput[]) =>
+    api.post<CodeResponse>("/attendance/batch", inputs),
+  removeBatch: (ids: number[]) =>
+    api.del<CodeResponse>(
+      "/attendance/batch",
+      ids.map((id) => ({ id })),
+    ),
 };
 
 // ---- Report ----

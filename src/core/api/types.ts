@@ -84,6 +84,27 @@ export interface Injury {
   updateddate?: string;
 }
 
+/** A training session. 입력 필드는 일시 하나뿐 (의도적 최소 설계). */
+export interface Training {
+  id: number;
+  team: number;
+  /** "YYYY-MM-DD HH:mm:ss" */
+  trainingdate: string;
+  createddate?: string;
+  updateddate?: string;
+}
+
+/** 훈련 참석 — 행 존재 = 참석, 체크 해제 = 행 삭제. */
+export interface Attendance {
+  id: number;
+  training: number;
+  player: number;
+  /** 선수별 훈련 시간(분). */
+  min: number;
+  createddate?: string;
+  updateddate?: string;
+}
+
 // ---- Response envelopes (controllers.go) ----
 
 export interface AuthResponse {
