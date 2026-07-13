@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import { EmptyView, StatusView } from "../../components/StateView/StateView";
@@ -36,6 +37,28 @@ export default function InjuriesPage() {
 
   const active = useMemo(() => activeInjuriesSorted(injuries ?? []), [injuries]);
   const past = useMemo(() => pastInjuriesSorted(injuries ?? []), [injuries]);
+
+  // 홈 부상자 명단에서 ?injury=<id>로 진입하면 해당 부상 수정 모달을 바로 연다.
+  // state 대신 URL에서 파생하고, 닫을 때 파라미터를 지워 다시 열리지 않게 한다(TrainingsPage와 동일).
+  const [searchParams, setSearchParams] = useSearchParams();
+  const deepLinkId = Number(searchParams.get("injury"));
+  const deepLinkInjury = deepLinkId
+    ? ((injuries ?? []).find((i) => i.id === deepLinkId) ?? null)
+    : null;
+  const formOpen = form.open || !!deepLinkInjury;
+  const editingInjury = form.open ? form.editing : deepLinkInjury;
+  const closeForm = () => {
+    form.close();
+    if (searchParams.has("injury")) {
+      setSearchParams(
+        (prev) => {
+          prev.delete("injury");
+          return prev;
+        },
+        { replace: true },
+      );
+    }
+  };
 
   // 복귀 처리 — 복귀일을 오늘로 종료. 날짜를 바꾸려면 항목을 눌러 수정하면 된다.
   function endInjury(injury: Injury) {
@@ -152,13 +175,13 @@ export default function InjuriesPage() {
         </section>
       )}
 
-      {form.open && (
+      {formOpen && (
         <InjuryFormModal
           teamId={team.id}
           players={playerList}
           injuredPlayerIds={new Set(active.map((i) => i.player))}
-          injury={form.editing}
-          onClose={form.close}
+          injury={editingInjury}
+          onClose={closeForm}
         />
       )}
     </div>

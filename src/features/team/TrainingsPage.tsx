@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import { EmptyView, StatusView } from "../../components/StateView/StateView";
@@ -30,6 +31,7 @@ export default function TrainingsPage() {
 
   const form = useFormModalState<Training>();
   const [checking, setChecking] = useState<Training | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const players = useMemo(() => playersQ.data ?? [], [playersQ.data]);
   const injuries = useMemo(() => injuriesQ.data ?? [], [injuriesQ.data]);
@@ -61,6 +63,26 @@ export default function TrainingsPage() {
     [players, trainings, attendances],
   );
   const hasHeld = playerStats.some((s) => s.stats.held > 0);
+
+  // 홈 캘린더에서 ?training=<id>로 진입하면 해당 훈련의 참석 체크를 바로 연다.
+  // state 대신 URL에서 파생하고, 닫을 때 파라미터를 지워 다시 열리지 않게 한다.
+  const deepLinkId = Number(searchParams.get("training"));
+  const deepLinkTraining = deepLinkId
+    ? (trainings.find((t) => t.id === deepLinkId) ?? null)
+    : null;
+  const activeChecking = checking ?? deepLinkTraining;
+  const closeChecking = () => {
+    setChecking(null);
+    if (searchParams.has("training")) {
+      setSearchParams(
+        (prev) => {
+          prev.delete("training");
+          return prev;
+        },
+        { replace: true },
+      );
+    }
+  };
 
   return (
     <div>
@@ -156,14 +178,14 @@ export default function TrainingsPage() {
         />
       )}
 
-      {checking && (
+      {activeChecking && (
         <AttendanceModal
           teamId={team.id}
-          training={checking}
+          training={activeChecking}
           players={players}
           injuries={injuries}
-          attendances={byTraining.get(checking.id) ?? []}
-          onClose={() => setChecking(null)}
+          attendances={byTraining.get(activeChecking.id) ?? []}
+          onClose={closeChecking}
         />
       )}
     </div>

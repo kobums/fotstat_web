@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import type { Match } from "../../core/api/types";
 import { dayOf } from "../../lib/date";
@@ -12,8 +13,9 @@ interface Props {
   matches: Match[];
 }
 
-/** 팀 홈 요약 — 현재 부상 중인 선수만 간략히 보여준다. 등록·수정은 사이드바 부상 탭에서. */
+/** 팀 홈 요약 — 현재 부상 중인 선수만 간략히 보여준다. 항목을 누르면 부상 탭의 해당 부상 수정으로 이동. */
 export default function InjuriesSection({ teamId, matches }: Props) {
+  const navigate = useNavigate();
   const { data: players } = usePlayers(teamId);
   const { data: injuries } = useInjuries(teamId);
 
@@ -40,7 +42,13 @@ export default function InjuriesSection({ teamId, matches }: Props) {
         {active.map((injury) => {
           const p = playerMap.get(injury.player);
           return (
-            <div key={injury.id} className={styles.row}>
+            <button
+              key={injury.id}
+              className={styles.row}
+              onClick={() =>
+                navigate(`/teams/${teamId}/injuries?injury=${injury.id}`)
+              }
+            >
               <PlayerAvatar
                 number={p?.number ?? 0}
                 position={p?.position}
@@ -63,7 +71,7 @@ export default function InjuriesSection({ teamId, matches }: Props) {
                   <span className={styles.since}>{dayOf(injury.startdate)}~</span>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

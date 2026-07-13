@@ -199,7 +199,9 @@ export default function TeamOverview() {
               <li key={t.id}>
                 <button
                   className={styles.dayItem}
-                  onClick={() => navigate(`/teams/${team.id}/trainings`)}
+                  onClick={() =>
+                    navigate(`/teams/${team.id}/trainings?training=${t.id}`)
+                  }
                 >
                   훈련
                   <span className={styles.dayTime}>
