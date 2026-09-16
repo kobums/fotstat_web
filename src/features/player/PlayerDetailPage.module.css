@@ -33,12 +33,82 @@
   max-width: var(--content-max);
   margin: 0 auto;
   padding: var(--sp-4);
-  display: flex;
-  flex-direction: column;
+}
+
+/* fotmob 선수 페이지처럼 좁으면 카드가 세로로 쌓이고(순서: 프로필 → 기간 → 요약 →
+   팀 내 위치 → 경기별 기록 → 부상 → 훈련 → 인바디), 900px 이상에서는
+   본문(요약·경기별 기록·인바디) | 우측 레일(팀 내 위치·부상·훈련) 2단이 된다.
+   좁을 때는 .main/.aside 래퍼를 display:contents로 녹여 자식들이 직접 grid-area로
+   자리를 잡고, 넓을 때는 래퍼가 각각 세로 flex 컬럼이 된다 — 긴 경기 목록이
+   우측 레일 카드 사이 간격을 벌리지 않게(행 스팬 대신 컬럼 분리). */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--sp-4);
+  grid-template-areas:
+    "profile"
+    "filter"
+    "tiles"
+    "rank"
+    "log"
+    "injury"
+    "training"
+    "inbody";
+}
+
+.main,
+.aside {
+  display: contents;
+}
+
+.filter {
+  grid-area: filter;
+}
+.tiles {
+  grid-area: tiles;
+}
+.rank {
+  grid-area: rank;
+}
+.log {
+  grid-area: log;
+}
+.injury {
+  grid-area: injury;
+}
+.training {
+  grid-area: training;
+}
+.inbody {
+  grid-area: inbody;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+    grid-template-areas:
+      "profile profile"
+      "filter  filter"
+      "main    aside";
+  }
+  .main,
+  .aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    min-width: 0;
+  }
+  .main {
+    grid-area: main;
+  }
+  .aside {
+    grid-area: aside;
+  }
 }
 
 .profile {
+  grid-area: profile;
   display: flex;
   align-items: center;
   gap: var(--sp-4);
@@ -71,15 +141,91 @@
   font-variant-numeric: tabular-nums;
 }
 
-.birth {
+/* 생일·나이 · 키·몸무게 — fotmob 팩트 그리드를 한 줄로 */
+.facts {
   margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px var(--sp-3);
   font-size: 13px;
   color: var(--text-ter);
   font-variant-numeric: tabular-nums;
 }
 
+.filter {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.filterHint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-ter);
+}
+
+.tiles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.noMatches {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: 13px;
+  color: var(--text-sec);
+  background: var(--bg-elev2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+/* 요약 타일 8개: 넓으면 4열 × 2줄, 좁으면 2열 × 4줄 */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--sp-2);
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-sec);
+  margin-bottom: var(--sp-2);
+}
+
+.sideCard {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: var(--sp-3);
+}
+
+.emptyText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-ter);
+}
+
+.trainingGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
+/* InbodySection 자체 상단 여백은 그리드 gap이 대신한다 */
+.inbody > section {
+  margin-top: 0;
 }
