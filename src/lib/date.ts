@@ -114,6 +114,17 @@ export function today(): string {
   return dayKey(new Date());
 }
 
+/** First day of `d`'s year as "YYYY-01-01" — 선수 상세의 기본 집계 시작일(올해). */
+export function yearStartKey(d: Date): string {
+  return `${d.getFullYear()}-01-01`;
+}
+
+/** "YYYY-MM-DD…" -> "MM.DD" (부상 기간·경기 목록 같은 좁은 칸의 짧은 날짜). */
+export function shortDay(date?: string | null): string {
+  const d = dayOf(date);
+  return d.length === 10 ? `${d.slice(5, 7)}.${d.slice(8, 10)}` : d;
+}
+
 /** First day of `d`'s month as "YYYY-MM-01". */
 export function monthStartKey(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-01`;

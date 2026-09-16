@@ -20,6 +20,11 @@ export function activeInjuriesSorted(injuries: Injury[]): Injury[] {
   return injuries.filter(isActiveInjury).sort(byStartdateDesc);
 }
 
+/** 한 선수의 부상 이력 전체를 최근 발생순으로. */
+export function playerInjuriesSorted(injuries: Injury[], playerId: number): Injury[] {
+  return injuries.filter((i) => i.player === playerId).sort(byStartdateDesc);
+}
+
 /** 복귀 완료 부상만 골라 최근순 정렬. */
 export function pastInjuriesSorted(injuries: Injury[]): Injury[] {
   return injuries.filter((i) => !isActiveInjury(i)).sort(byStartdateDesc);

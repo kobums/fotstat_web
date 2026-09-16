@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import {
   parseMatchDate,
+  shortDay,
+  yearStartKey,
   toApiDate,
   toApiDateSeconds,
   toInputValue,
@@ -111,5 +113,17 @@ describe("day keys", () => {
 
   it("monthStartKey returns the first of the month", () => {
     expect(monthStartKey(new Date(2026, 5, 23))).toBe("2026-06-01");
+  });
+});
+
+describe("yearStartKey / shortDay", () => {
+  it("yearStartKey는 그 해 1월 1일", () => {
+    expect(yearStartKey(new Date(2026, 8, 16))).toBe("2026-01-01");
+  });
+  it("shortDay는 MM.DD, 형식이 아니면 그대로", () => {
+    expect(shortDay("2026-09-16")).toBe("09.16");
+    expect(shortDay("2026-09-16 10:00:00")).toBe("09.16");
+    expect(shortDay("")).toBe("");
+    expect(shortDay(undefined)).toBe("");
   });
 });
