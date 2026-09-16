@@ -27,17 +27,6 @@
   margin-top: 0;
 }
 
-.logEmpty {
-  margin-top: var(--sp-2);
-  padding: var(--sp-4);
-  text-align: center;
-  font-size: 13px;
-  color: var(--text-ter);
-  background: var(--bg-elev2);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-}
-
 .head {
   display: flex;
   align-items: center;
@@ -146,138 +135,13 @@
   white-space: nowrap;
 }
 
-/* 경기별 기록 · 부상 이력 카드 */
+/* 부상 이력 카드 */
 .logCard {
   margin-top: var(--sp-4);
   background: var(--bg-elev2);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   padding: var(--sp-3);
-}
-
-.logList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-}
-
-.logItem {
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  padding: var(--sp-2) var(--sp-3);
-  background: var(--bg-elev);
-}
-
-.logHead {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 6px;
-}
-
-.logDate {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-sec);
-}
-
-.logOpp {
-  font-size: 13px;
-  font-weight: 600;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.logScore {
-  font-size: 14px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.qLines {
-  display: grid;
-  grid-template-columns: auto auto 1fr auto;
-  gap: 3px var(--sp-2);
-  align-items: baseline;
-}
-
-.qLine {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid;
-  align-items: baseline;
-}
-
-.qNum {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-sec);
-}
-
-.qMin {
-  font-size: 12px;
-  color: var(--text-ter);
-  font-variant-numeric: tabular-nums;
-}
-
-.qStat {
-  font-size: 12px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.qCards {
-  font-size: 11px;
-  justify-self: end;
-  white-space: nowrap;
-}
-
-.logTotal {
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px dashed var(--line);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-sec);
-  font-variant-numeric: tabular-nums;
-}
-
-.injList {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.injItem {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  font-size: 13px;
-}
-
-.injType {
-  font-weight: 700;
-}
-
-.injPeriod {
-  color: var(--text-ter);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-
-.injActive {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--neg);
-  background: color-mix(in srgb, var(--neg) 14%, transparent);
-  border-radius: var(--r-sm);
-  padding: 2px 6px;
-  margin-left: auto;
 }
 
 @media (max-width: 420px) {

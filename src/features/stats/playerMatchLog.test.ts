@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Match, MatchRecord, Quarter } from "../../core/api/types";
-import { playerMatchLogs } from "./playerMatchLog";
+import { cardText, playerMatchLogs } from "./playerMatchLog";
 
 const matches: Match[] = [
   { id: 1, team: 1, awayname: "A팀", matchdate: "2026-06-01 10:00:00" },
@@ -69,5 +69,13 @@ describe("playerMatchLogs", () => {
 
   it("기록이 없는 선수는 빈 배열", () => {
     expect(playerMatchLogs(999, matches, quarters, records)).toEqual([]);
+  });
+});
+
+describe("cardText", () => {
+  it("0은 빈칸, 1은 아이콘, 2+는 아이콘+개수", () => {
+    expect(cardText(0, 0)).toBe("");
+    expect(cardText(1, 0)).toBe("🟨");
+    expect(cardText(2, 1)).toBe("🟨2 🟥");
   });
 });

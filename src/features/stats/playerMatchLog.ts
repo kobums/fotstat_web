@@ -104,3 +104,11 @@ export function playerMatchLogs(
   );
   return logs;
 }
+
+/** 카드 표기: 0이면 빈칸, 1이면 아이콘만, 2+면 아이콘+개수. */
+export function cardText(yellow: number, red: number): string {
+  const parts: string[] = [];
+  if (yellow > 0) parts.push(yellow > 1 ? `🟨${yellow}` : "🟨");
+  if (red > 0) parts.push(red > 1 ? `🟥${red}` : "🟥");
+  return parts.join(" ");
+}
