@@ -11,6 +11,10 @@ export interface PlayerStat {
   min: number;
   goal: number;
   assist: number;
+  /** 경고(옐로카드) 누적. */
+  yellow: number;
+  /** 퇴장(레드카드) 누적. */
+  red: number;
   /** 부상으로 결장한 경기 수 (집계 기간 내). */
   absentGames: number;
 }
@@ -84,7 +88,10 @@ export function aggregateTeamStats(
   // so the map keys are exactly the played matches.
   const goalsByMatch = perMatchGoals(allQuarters, records);
 
-  const perPlayer = new Map<number, { min: number; goal: number; assist: number }>();
+  const perPlayer = new Map<
+    number,
+    { min: number; goal: number; assist: number; yellow: number; red: number }
+  >();
   const matchesByPlayer = playerMatchIds(allQuarters, records);
   let totalGoal = 0;
   let totalAssist = 0;
@@ -92,10 +99,13 @@ export function aggregateTeamStats(
   records.forEach((r) => {
     totalGoal += r.goal;
     totalAssist += r.assist;
-    const acc = perPlayer.get(r.player) ?? { min: 0, goal: 0, assist: 0 };
+    const acc =
+      perPlayer.get(r.player) ?? { min: 0, goal: 0, assist: 0, yellow: 0, red: 0 };
     acc.min += r.min;
     acc.goal += r.goal;
     acc.assist += r.assist;
+    acc.yellow += r.yellowcard;
+    acc.red += r.redcard;
     perPlayer.set(r.player, acc);
   });
 
@@ -128,6 +138,8 @@ export function aggregateTeamStats(
       min: acc?.min ?? 0,
       goal: acc?.goal ?? 0,
       assist: acc?.assist ?? 0,
+      yellow: acc?.yellow ?? 0,
+      red: acc?.red ?? 0,
       absentGames: absentGamesFor(p.id, injuries, matches),
     };
   });

@@ -64,6 +64,18 @@ describe("aggregateTeamStats", () => {
     expect(r.losses).toBe(1);
   });
 
+  it("accumulates yellow/red cards per player across quarters", () => {
+    const carded: MatchRecord[] = [
+      record({ id: 1, quarter: 11, player: 1, yellowcard: 1 }),
+      record({ id: 2, quarter: 12, player: 1, yellowcard: 1, redcard: 1 }),
+      record({ id: 3, quarter: 13, player: 2 }),
+    ];
+    const r = aggregateTeamStats(quarters, carded, players);
+    expect(r.players.find((p) => p.id === 1)).toMatchObject({ yellow: 2, red: 1 });
+    expect(r.players.find((p) => p.id === 2)).toMatchObject({ yellow: 0, red: 0 });
+    expect(r.players.find((p) => p.id === 3)).toMatchObject({ yellow: 0, red: 0 });
+  });
+
   it("computes per-player lines and sorts by goal/assist/min", () => {
     const r = aggregateTeamStats(quarters, records, players);
     expect(r.players.map((p) => p.id)).toEqual([1, 2, 3]);

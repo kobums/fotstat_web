@@ -8,6 +8,7 @@ import {
   injuryCoversMatch,
   isActiveInjury,
   pastInjuriesSorted,
+  playerInjuriesSorted,
 } from "./injury";
 
 function injury(p: Partial<Injury> & Pick<Injury, "id" | "player">): Injury {
@@ -134,5 +135,17 @@ describe("absentGamesFor", () => {
     ];
     expect(absentGamesFor(1, injuries, matches, "2026-07-02")).toBe(2);
     expect(absentGamesFor(3, injuries, matches, "2026-07-02")).toBe(0);
+  });
+});
+
+describe("playerInjuriesSorted", () => {
+  it("해당 선수 부상만 최근 발생순", () => {
+    const list: Injury[] = [
+      { id: 1, player: 7, startdate: "2026-03-01", returndate: "2026-03-10" },
+      { id: 2, player: 8, startdate: "2026-04-01", returndate: "" },
+      { id: 3, player: 7, startdate: "2026-05-01", returndate: "" },
+    ];
+    expect(playerInjuriesSorted(list, 7).map((i) => i.id)).toEqual([3, 1]);
+    expect(playerInjuriesSorted(list, 9)).toEqual([]);
   });
 });

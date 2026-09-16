@@ -1,0 +1,41 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-ter);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 13px;
+}
+
+.type {
+  font-weight: 700;
+}
+
+.period {
+  color: var(--text-ter);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.active {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--neg);
+  background: color-mix(in srgb, var(--neg) 14%, transparent);
+  border-radius: var(--r-sm);
+  padding: 2px 6px;
+  margin-left: auto;
+}
