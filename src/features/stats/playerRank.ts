@@ -38,7 +38,9 @@ export function teamRank(value: number, all: number[]): { rank: number; total: n
 export const PCT_MIN_SQUAD = 5;
 
 export function rankLabel(m: RankMetric): string {
-  if (m.total === 0) return "-";
+  // 값이 0이면 순위를 매기지 않는다 — 전원이 0일 때 모두 공동 1위가 되어
+  // "0% · 상위 5%" 같은 배지가 붙는 것을 막는다(RankingList 의 "-" 표기와 같은 규칙).
+  if (m.total === 0 || m.value <= 0) return "-";
   return m.total >= PCT_MIN_SQUAD ? `상위 ${m.pct}%` : `${m.rank}위 / ${m.total}명`;
 }
 
@@ -55,13 +57,15 @@ interface MetricDef {
   label: string;
   pick: (p: PlayerStat) => number;
   unit?: string;
+  /** 경기당 모드의 소수 자릿수(기본 2). 분 단위는 소수가 어색해 정수로 반올림한다. */
+  perGameDecimals?: number;
 }
 
 const STAT_METRICS: MetricDef[] = [
   { key: "goal", label: "골", pick: (p) => p.goal },
   { key: "assist", label: "도움", pick: (p) => p.assist },
   { key: "points", label: "공격P", pick: (p) => p.goal + p.assist },
-  { key: "min", label: "출전 시간", pick: (p) => p.min, unit: "′" },
+  { key: "min", label: "출전 시간", pick: (p) => p.min, unit: "′", perGameDecimals: 0 },
 ];
 
 /**
@@ -80,7 +84,6 @@ export function playerRankMetrics(
   const me = players.find((p) => p.id === playerId);
   if (!me) return [];
   const played = players.filter((p) => p.games > 0);
-  const decimals = mode === "perGame" ? 2 : 0;
 
   const metrics: RankMetric[] = STAT_METRICS.map((def) => {
     const valueOf = (p: PlayerStat) =>
@@ -98,7 +101,7 @@ export function playerRankMetrics(
       total,
       max: Math.max(...all, 0) || 1,
       unit: def.unit ?? "",
-      decimals,
+      decimals: mode === "perGame" ? (def.perGameDecimals ?? 2) : 0,
     };
   });
 
