@@ -1,7 +1,7 @@
 // Typed endpoint functions grouped by domain.
 // List calls unwrap to T[]; single calls to T; mutations return CodeResponse.
 
-import { api } from "./client";
+import { api, ApiError } from "./client";
 import type {
   Attendance,
   AuthResponse,
@@ -13,6 +13,7 @@ import type {
   Match,
   MatchRecord,
   Player,
+  PlayerStatsResult,
   Quarter,
   Team,
   Training,
@@ -79,6 +80,24 @@ export const playerApi = {
   update: (player: PlayerInput & { id: number }) =>
     api.put<CodeResponse>("/player", player),
   remove: (id: number) => api.del<CodeResponse>("/player", { id }),
+  /**
+   * 선수 상세 통계 — 요약·스쿼드 집계·경기별 기록·부상 이력·훈련 참석을 한 번에.
+   * start/end 는 "YYYY-MM-DD"(inclusive), 비우면 전체 기간. 서버가 집계하므로
+   * 경기→쿼터→기록 fan-out(useTeamStats)이 필요 없다.
+   */
+  stats: (playerId: number, start?: string, end?: string, signal?: AbortSignal) =>
+    api
+      .get<ItemResponse<PlayerStatsResult>>(
+        `/player/${playerId}/stats`,
+        { start: start || undefined, end: end || undefined },
+        signal,
+      )
+      .then((res) => {
+        // 정상 응답엔 항상 item 이 있고 오류 envelope 은 client 가 먼저 던지므로
+        // 방어 코드지만, 앱 전역 에러 타입(ApiError)으로 던져 notifyError 가 메시지를 꺼낼 수 있게 한다.
+        if (!res.item) throw new ApiError(res.message || "선수 통계를 불러오지 못했습니다.", 200, res.code);
+        return res.item;
+      }),
 };
 
 // ---- Match ----

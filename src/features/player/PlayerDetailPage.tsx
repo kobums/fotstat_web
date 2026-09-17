@@ -8,18 +8,15 @@ import PlayerAvatar from "../../components/PlayerAvatar/PlayerAvatar";
 import PosChip from "../../components/PosChip/PosChip";
 import StatTile from "../../components/StatTile/StatTile";
 import { ErrorView, LoadingView } from "../../components/StateView/StateView";
-import { ageFrom, dayOf, today, yearStartKey } from "../../lib/date";
-import { playerInjuriesSorted } from "../../lib/injury";
+import { ageFrom, today, yearStartKey } from "../../lib/date";
 import { playerInbodiesSorted } from "../../lib/inbody";
-import { playerTrainingStats, type PlayerTrainingStats } from "../../lib/training";
+import type { PlayerTrainingStats } from "../../lib/training";
 import { useTeam } from "../team/useTeams";
-import { useAttendances, useTrainings } from "../team/useTrainings";
-import { useTeamStats } from "../stats/useTeamStats";
-import { playerMatchLogs } from "../stats/playerMatchLog";
 import PlayerMatchLogList from "../stats/PlayerMatchLogList";
 import PlayerInjuryList from "../stats/PlayerInjuryList";
 import { useDeletePlayer, usePlayers } from "./usePlayers";
 import { useInbodies } from "./useInbodies";
+import { usePlayerStats } from "./usePlayerStats";
 import InbodySection from "./InbodySection";
 import PlayerFormModal from "./PlayerFormModal";
 import TeamRankCard from "./TeamRankCard";
@@ -34,8 +31,8 @@ const perGame = (value: number, games: number) => (games > 0 ? value / games : 0
 
 /**
  * 선수 상세 — fotmob 선수 페이지의 3단 패턴(요약 타일 → 경기별 기록 → 팀 내 순위)에
- * 부상 이력·훈련 참석·인바디를 더한 화면. 통계는 백엔드 API가 없어 팀 통계 훅의
- * 클라이언트 집계를 그대로 쓴다.
+ * 부상 이력·훈련 참석·인바디를 더한 화면. 통계는 서버 집계(GET /player/:id/stats)
+ * 한 번으로 받는다 — 요약·스쿼드·경기별 기록·부상 이력·훈련 참석이 모두 들어 있다.
  */
 export default function PlayerDetailPage() {
   const { teamId, playerId } = useParams();
@@ -46,52 +43,31 @@ export default function PlayerDetailPage() {
   const team = useTeam(tId);
   const players = usePlayers(tId);
   const inbodies = useInbodies(tId);
-  const trainings = useTrainings(tId);
-  const attendances = useAttendances(tId);
   const del = useDeletePlayer(tId);
   const [editOpen, setEditOpen] = useState(false);
   const [range, setRange] = useState(thisYearRange);
   const filtered = !!range.start || !!range.end;
 
-  const stats = useTeamStats(tId, range);
+  const stats = usePlayerStats(pId, range);
+  const data = stats.data;
 
   const player = players.data?.find((p) => p.id === pId);
-  const stat = stats.players.find((p) => p.id === pId);
+  const stat = data?.summary;
 
   const latestInbody = useMemo(
     () => playerInbodiesSorted(inbodies.data ?? [], pId)[0],
     [inbodies.data, pId],
   );
 
-  const logs = useMemo(
-    () => playerMatchLogs(pId, stats.matches, stats.quarters, stats.records),
-    [pId, stats.matches, stats.quarters, stats.records],
-  );
-  // 부상 이력은 기간 필터와 무관하게 전체 이력 — fotmob 경력 카드처럼 "이 선수의
-  // 내력"이지 기간 집계가 아니다. 기간 반영은 결장 타일(absentGames)이 담당한다.
-  const injuries = useMemo(
-    () => playerInjuriesSorted(stats.injuries, pId),
-    [stats.injuries, pId],
-  );
-
-  // 훈련도 같은 기간으로 자른다 — 경기 집계와 분모가 맞아야 참석률이 의미 있다.
-  const trainingInRange = useMemo(() => {
-    const list = trainings.data ?? [];
-    return list.filter((t) => {
-      const d = dayOf(t.trainingdate);
-      return (!range.start || d >= range.start) && (!range.end || d <= range.end);
-    });
-  }, [trainings.data, range.start, range.end]);
-  const hasTraining = trainingInRange.length > 0;
+  // 팀 내 위치의 참석률 행 — 서버가 스쿼드 전원의 참석 집계를 함께 내려준다.
+  // 기간 내 열린 훈련이 없으면 training 이 null 이라 행을 붙이지 않는다.
   const trainingByPlayer = useMemo(() => {
-    if (!hasTraining) return undefined;
+    if (!data || !data.summary.training) return undefined;
     const map = new Map<number, PlayerTrainingStats>();
-    for (const p of stats.players) {
-      map.set(p.id, playerTrainingStats(p.id, trainingInRange, attendances.data ?? []));
-    }
+    for (const p of data.squad) if (p.training) map.set(p.id, p.training);
     return map;
-  }, [hasTraining, stats.players, trainingInRange, attendances.data]);
-  const myTraining = trainingByPlayer?.get(pId);
+  }, [data]);
+  const myTraining = data?.summary.training ?? undefined;
 
   async function onDelete() {
     if (!player) return;
@@ -191,9 +167,14 @@ export default function PlayerDetailPage() {
               <div className={styles.tiles}>
                 {stats.isLoading ? (
                   <LoadingView label="통계 집계 중…" />
+                ) : stats.isError ? (
+                  <ErrorView
+                    message="선수 통계를 불러오지 못했습니다."
+                    onRetry={() => stats.refetch()}
+                  />
                 ) : (
                   <>
-                    {filtered && stats.matchCount === 0 && (
+                    {filtered && data?.matchCount === 0 && (
                       <div className={styles.noMatches}>
                         <span>이 기간에 경기가 없습니다.</span>
                         <Button
@@ -233,11 +214,11 @@ export default function PlayerDetailPage() {
                 )}
               </div>
 
-              {!stats.isLoading && (
+              {data && (
                 <section className={styles.log}>
                   <h3 className={styles.sectionTitle}>경기별 기록</h3>
                   <PlayerMatchLogList
-                    logs={logs}
+                    logs={data.matches}
                     matchHref={(id) => `/teams/${tId}/matches/${id}`}
                   />
                 </section>
@@ -248,12 +229,12 @@ export default function PlayerDetailPage() {
               </div>
             </div>
 
-            {!stats.isLoading && (
+            {data && (
               <div className={styles.aside}>
                 <div className={styles.rank}>
                   <TeamRankCard
                     playerId={pId}
-                    players={stats.players}
+                    players={data.squad}
                     training={trainingByPlayer}
                   />
                 </div>
@@ -261,7 +242,7 @@ export default function PlayerDetailPage() {
                 <section className={styles.injury}>
                   <h3 className={styles.sectionTitle}>부상 이력</h3>
                   <div className={styles.sideCard}>
-                    <PlayerInjuryList injuries={injuries} />
+                    <PlayerInjuryList injuries={data.injuries} />
                   </div>
                 </section>
 
