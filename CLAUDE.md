@@ -31,7 +31,7 @@ React 19 + TypeScript + Vite / react-router-dom v7 / @tanstack/react-query v5 / 
 - **스타일은 CSS Modules + `tokens.css` 변수**. 인라인 스타일·하드코딩 색상 금지. 다크모드는 변수로 자동 처리.
 - **네이티브 폼 컨트롤 대신 디자인 시스템 컴포넌트 사용**: 드롭다운은 `components/Select`, 날짜는 `components/DatePicker`, 날짜+시간은 `components/DateTimePicker`(내부적으로 `Calendar/CalendarGrid` 공유). native `<select>`/`<input type="date">` 추가 금지.
 - 위치/포지션 색은 `--role-*` 토큰(`--pos`는 semantic positive와 혼동 방지를 위해 사용하지 않음).
-- 통계엔 백엔드 집계 API가 없어 `matches→quarters→records`를 클라이언트에서 합산(`features/stats/useTeamStats.ts`). 경기 수가 많아지면 성능 주의.
+- 팀 통계 탭은 백엔드 집계 API가 없어 `matches→quarters→records`를 클라이언트에서 합산(`features/stats/useTeamStats.ts`). 경기 수가 많아지면 성능 주의. **선수 상세만** 서버 집계 `GET /player/:id/stats`(`features/player/usePlayerStats.ts`)를 쓴다.
 
 ## 환경 변수
 

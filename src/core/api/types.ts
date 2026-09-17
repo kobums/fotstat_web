@@ -132,6 +132,73 @@ export interface Inbody {
 
 // ---- Response envelopes (controllers.go) ----
 
+// ---- 선수 상세 통계 (GET /player/:id/stats) ----
+// 서버 controllers/rest/playerstats.go 의 응답. 필드 이름은 클라이언트 집계 타입
+// (features/stats PlayerStat · PlayerMatchLog · lib/training PlayerTrainingStats)과 맞춰
+// 화면 컴포넌트가 그대로 소비한다.
+
+export interface PlayerTrainingLine {
+  attended: number;
+  held: number;
+  rate: number;
+  totalMin: number;
+}
+
+export interface PlayerStatsLine {
+  id: number;
+  name: string;
+  number: number;
+  position: string;
+  games: number;
+  min: number;
+  goal: number;
+  assist: number;
+  yellow: number;
+  red: number;
+  absentGames: number;
+  /** 기간 내 열린 훈련이 없으면 null. */
+  training: PlayerTrainingLine | null;
+}
+
+export interface PlayerStatsQuarterLine {
+  quarterId: number;
+  number: number;
+  min: number;
+  goal: number;
+  assist: number;
+  yellow: number;
+  red: number;
+}
+
+export interface PlayerStatsMatchLine {
+  matchId: number;
+  opponent: string;
+  matchdate: string;
+  home: number;
+  away: number;
+  quarters: PlayerStatsQuarterLine[];
+  min: number;
+  goal: number;
+  assist: number;
+  yellow: number;
+  red: number;
+}
+
+export interface PlayerStatsResult {
+  player: Player;
+  start: string;
+  end: string;
+  /** 기간 내 진행된(쿼터가 있는) 팀 경기 수. */
+  matchCount: number;
+  summary: PlayerStatsLine;
+  /** 스쿼드 전원(순위·팀 평균 계산용), 등번호→이름 순. */
+  squad: PlayerStatsLine[];
+  /** 최신 경기 순. */
+  matches: PlayerStatsMatchLine[];
+  /** 기간과 무관한 전체 이력, 최신 발생순. */
+  injuries: Injury[];
+}
+
 export interface AuthResponse {
   code: "ok" | "error";
   token?: string;

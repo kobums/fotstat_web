@@ -11,4 +11,6 @@ export const qk = {
   trainings: (teamId: number) => ["trainings", teamId] as const,
   inbodies: (teamId: number) => ["inbodies", teamId] as const,
   attendances: (teamId: number) => ["attendances", teamId] as const,
+  playerStats: (playerId: number, start: string, end: string) =>
+    ["playerStats", playerId, start, end] as const,
 };
