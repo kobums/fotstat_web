@@ -63,7 +63,8 @@ function CompareRow({
           )}
           {flat ? "" : `${diff > 0 ? "+" : ""}${diff.toFixed(2)}`}
         </span>
-        <span className={styles.pct}>상위 {pct}%</span>
+        {/* 값이 0이면 순위를 매기지 않는다 — 전원 0일 때의 공동 1위 배지 방지(playerRank.rankLabel 과 같은 규칙) */}
+        <span className={styles.pct}>{value > 0 ? `상위 ${pct}%` : "-"}</span>
       </div>
     </div>
   );

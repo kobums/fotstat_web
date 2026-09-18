@@ -56,6 +56,12 @@ describe("playerRankMetrics", () => {
     expect(zero.rank).toBe(4);
   });
 
+  it("경기당 출전 시간은 정수 분으로 표시한다(다른 지표는 소수 둘째 자리)", () => {
+    const m = playerRankMetrics(1, squad, "perGame");
+    expect(m.find((x) => x.key === "min")!.decimals).toBe(0);
+    expect(m.find((x) => x.key === "points")!.decimals).toBe(2);
+  });
+
   it("훈련 통계가 있으면 참석률 지표를 덧붙인다", () => {
     const training = new Map<number, PlayerTrainingStats>([
       [1, { attended: 8, held: 10, rate: 80, totalMin: 480 }],
@@ -81,5 +87,9 @@ describe("rankLabel", () => {
     expect(rankLabel({ ...base, pct: 20, rank: 1, total: 5 })).toBe("상위 20%");
     expect(rankLabel({ ...base, pct: 25, rank: 1, total: 4 })).toBe("1위 / 4명");
     expect(rankLabel({ ...base, pct: 100, rank: 1, total: 0 })).toBe("-");
+  });
+  it("값이 0이면 순위를 매기지 않는다 — 전원 0일 때의 공동 1위 배지 방지", () => {
+    expect(rankLabel({ ...base, value: 0, pct: 5, rank: 1, total: 21 })).toBe("-");
+    expect(rankLabel({ ...base, value: 0, pct: 34, rank: 1, total: 3 })).toBe("-");
   });
 });

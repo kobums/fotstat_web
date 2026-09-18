@@ -64,6 +64,20 @@ describe("TeamRankCard", () => {
     expect(screen.getByText("50%")).toBeInTheDocument();
   });
 
+  it("값이 0인 지표는 배지가 '-' 이고, 경기당 출전 시간은 정수 분이다", async () => {
+    const user = userEvent.setup();
+    // 선수5 는 기록이 전혀 없다 → 모든 지표가 0
+    const { unmount } = render(<TeamRankCard playerId={5} players={squad} />);
+    expect(screen.getAllByText("-").length).toBe(4);
+    expect(screen.queryByText(/상위 \d+%/)).not.toBeInTheDocument();
+    unmount();
+
+    render(<TeamRankCard playerId={2} players={squad} />);
+    await user.click(screen.getByRole("button", { name: "경기당" }));
+    expect(screen.getByText("50′")).toBeInTheDocument(); // 100분 / 2경기
+    expect(screen.queryByText("50.00′")).not.toBeInTheDocument();
+  });
+
   it("스쿼드에 없는 선수면 아무것도 그리지 않는다", () => {
     const { container } = render(<TeamRankCard playerId={99} players={squad} />);
     expect(container).toBeEmptyDOMElement();
