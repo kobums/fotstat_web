@@ -27,7 +27,8 @@ function items<T>(res: ItemsResponse<T>): T[] {
 
 export const authApi = {
   loginEmail: (email: string, password: string) =>
-    api.get<AuthResponse>("/jwt", { email, password }),
+    // 자격증명은 본문으로만 보낸다 (GET 쿼리스트링은 URL·로그에 남음)
+    api.post<AuthResponse>("/jwt", { email, password }),
   register: (email: string, password: string, name: string) =>
     api.post<AuthResponse>("/user", { email, password, name }),
   guest: () => api.post<AuthResponse>("/guest", {}),
