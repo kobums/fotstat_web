@@ -5,6 +5,7 @@ import AppHeader from "../../components/AppHeader/AppHeader";
 import Button from "../../components/Button/Button";
 import { useAuth } from "../../core/auth/AuthContext";
 import { useTheme } from "../../core/theme/ThemeContext";
+import { LEGAL_URLS } from "../../lib/legal";
 import { errorMessage } from "../../lib/notifyError";
 import UpgradeModal from "./UpgradeModal";
 import styles from "./SettingsPage.module.css";
@@ -92,6 +93,22 @@ export default function SettingsPage() {
             <span className={styles.k}>버전</span>
             <span className={styles.v}>v{__APP_VERSION__}</span>
           </div>
+          <a
+            className={styles.link}
+            href={LEGAL_URLS.terms}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            이용약관
+          </a>
+          <a
+            className={styles.link}
+            href={LEGAL_URLS.privacy}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            개인정보 처리방침
+          </a>
         </section>
 
         <section className={styles.card}>

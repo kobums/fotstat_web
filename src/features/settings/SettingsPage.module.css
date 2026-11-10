@@ -93,3 +93,11 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.link {
+  align-self: flex-start;
+  padding: var(--sp-1) 0;
+  font-size: 14px;
+  color: var(--text-sec);
+  text-decoration: underline;
+}

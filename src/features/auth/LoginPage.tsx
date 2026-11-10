@@ -5,6 +5,7 @@ import TextField from "../../components/TextField/TextField";
 import { useAuth } from "../../core/auth/AuthContext";
 import { errorMessage } from "../../lib/notifyError";
 import AuthScreen from "./AuthScreen";
+import LegalNotice from "./LegalNotice";
 import styles from "./auth.module.css";
 
 export default function LoginPage() {
@@ -82,6 +83,8 @@ export default function LoginPage() {
       <div className={styles.appleNote}>
         Apple 로그인은 백엔드 Service ID 설정 후 제공됩니다.
       </div>
+
+      <LegalNotice />
     </AuthScreen>
   );
 }
