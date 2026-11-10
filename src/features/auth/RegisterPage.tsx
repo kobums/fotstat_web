@@ -5,6 +5,7 @@ import TextField from "../../components/TextField/TextField";
 import { useAuth } from "../../core/auth/AuthContext";
 import { errorMessage } from "../../lib/notifyError";
 import AuthScreen from "./AuthScreen";
+import LegalNotice from "./LegalNotice";
 import styles from "./auth.module.css";
 
 export default function RegisterPage() {
@@ -68,6 +69,8 @@ export default function RegisterPage() {
           가입하기
         </Button>
       </form>
+
+      <LegalNotice />
     </AuthScreen>
   );
 }

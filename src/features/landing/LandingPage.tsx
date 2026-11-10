@@ -10,7 +10,9 @@ import {
 } from "lucide-react";
 import Button from "../../components/Button/Button";
 import { useAuth } from "../../core/auth/AuthContext";
+import { LEGAL_URLS } from "../../lib/legal";
 import { errorMessage } from "../../lib/notifyError";
+import LegalNotice from "../auth/LegalNotice";
 import styles from "./LandingPage.module.css";
 
 const FEATURES = [
@@ -114,6 +116,7 @@ export default function LandingPage() {
             </>
           )}
         </div>
+        {!isAuthenticated && <LegalNotice />}
       </section>
 
       <section className={styles.features}>
@@ -129,6 +132,14 @@ export default function LandingPage() {
       </section>
 
       <footer className={styles.footer}>
+        <nav className={styles.footerLinks} aria-label="약관">
+          <a href={LEGAL_URLS.terms} target="_blank" rel="noopener noreferrer">
+            이용약관
+          </a>
+          <a href={LEGAL_URLS.privacy} target="_blank" rel="noopener noreferrer">
+            개인정보 처리방침
+          </a>
+        </nav>
         © {new Date().getFullYear()} fotstat
       </footer>
     </div>
